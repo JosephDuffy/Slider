@@ -251,37 +251,7 @@ open class Slider: UIControl {
 extension Slider {
 
     internal static func defaultForegroundValueImage() -> UIImage {
-        return UIImage(named: "foregroundSliderImage")!//.stretchableImage(withLeftCapWidth: 2, topCapHeight: 0).withRenderingMode(.alwaysTemplate)
-        let format = UIGraphicsImageRendererFormat()
-        format.scale = 1
-        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 6, height: 4), format: format)
-        let image =  renderer.image { context in
-            context.fill(CGRect(x: 0, y: 0, width: 6, height: 4))
-
-            UIColor.black.setFill()
-            context.fill(CGRect(x: 3, y: 0, width: 3, height: 4))
-            context.fill(CGRect(x: 1, y: 1, width: 2, height: 2))
-
-            UIColor.black.withAlphaComponent(0.329412).setFill()
-            context.fill(CGRect(x: 0, y: 0, width: 1, height: 1))
-            context.fill(CGRect(x: 0, y: 3, width: 1, height: 1))
-
-            UIColor.black.withAlphaComponent(0.890196).setFill()
-            context.fill(CGRect(x: 1, y: 0, width: 1, height: 1))
-            context.fill(CGRect(x: 1, y: 3, width: 1, height: 1))
-
-            UIColor.black.withAlphaComponent(0.996078).setFill()
-            context.fill(CGRect(x: 2, y: 0, width: 1, height: 1))
-            context.fill(CGRect(x: 2, y: 3, width: 1, height: 1))
-
-            UIColor.black.withAlphaComponent(0.921569).setFill()
-            context.fill(CGRect(x: 0, y: 1, width: 1, height: 1))
-            context.fill(CGRect(x: 0, y: 2, width: 1, height: 1))
-        }
-
-        print(image.pngData()!.base64EncodedString())
-
-        return image.stretchableImage(withLeftCapWidth: 1, topCapHeight: 0).withRenderingMode(.alwaysTemplate)
+        return UIImage(named: "foregroundSliderImage")!
     }
 
     internal static func defaultBackgroundValueImage() -> UIImage {
@@ -290,12 +260,6 @@ extension Slider {
 
     internal static func defaultThumbImage() -> UIImage {
         return UIImage(named: "thumb")!
-        //        let format = UIGraphicsImageRendererFormat()
-        //        format.scale = 1
-        //        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 114, height: 87), format: format)
-        //
-        //        let insets = UIEdgeInsets(top: 15, left: 29, bottom: 16, right: 29)
-        //        let innerSquareSize = CGSize(width: 38, height: 40)
     }
 
 }
