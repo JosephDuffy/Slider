@@ -23,7 +23,7 @@ Eventually I would love for the project to be open-source, but for now I think i
 
 A rough roadmap that I would say moves us to a 1.0 would be:
 
- - [ ] Fix slider tracks not looking right
+ - [ ] Fix slider tracks slicing
  - [ ] Increase tap area of thumbs
  - [ ] Fix shadow of thumb being clipped
  - [ ] Tests for the scaling options
@@ -41,5 +41,6 @@ In the future we may add:
  - [ ] API mirroring with `UISlider`. Other than `value` property this should be possible
    - Another option is to make `value` the result of `upperValue` - `lowerValue`
  - [ ] Support a single thumb
+  - This will also require the minimum track slicing to be correct
  - [ ] Support any number of thumbs
  - [ ] Accessibility support
