@@ -33,6 +33,7 @@ A rough roadmap that I would say moves us to a 1.0 would be:
 
 In the future we may add:
 
+ - [ ] `OSLog` support
  - [ ] Snapshot tests to compare to the system `UISlider` on various device screen scales
  - [ ] Fix width being different to `UISlider`
  - [ ] Support different images per-state
