@@ -13,14 +13,6 @@ class ViewController: UIViewController {
     @IBOutlet private var uiSlider: UISlider!
     @IBOutlet private var slider: Slider!
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        slider.backgroundColor = .red
-//        uiSlider.setThumbImage(#imageLiteral(resourceName: "thumb"), for: .normal)
-    }
-
-
 }
 
 open class ThumbImageView: UIImageView {
