@@ -29,6 +29,7 @@ A rough roadmap that I would say moves us to a 1.0 would be:
  - [ ] Tests for the scaling options
  - [ ] Move to `github.com/Thread/Slider` or similar
  - [ ] Create as Swift Package
+  - With a lack of support for bundling assets this may not be possible, unless the images are created programmatically
  - [ ] Open source
 
 In the future we may add:
