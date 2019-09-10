@@ -23,21 +23,21 @@ Eventually I would love for the project to be open-source, but for now I think i
 
 A rough roadmap that I would say moves us to a 1.0 would be:
 
- - [] Fix slider tracks not looking right
- - [] Increase tap area of thumbs
- - [] Fix shadow of thumb being clipped
- - [] Tests for the scaling options
- - [] Move to `github.com/Thread/Slider` or similar
- - [] Create as Swift Package
- - [] Open source
+ - [ ] Fix slider tracks not looking right
+ - [ ] Increase tap area of thumbs
+ - [ ] Fix shadow of thumb being clipped
+ - [ ] Tests for the scaling options
+ - [ ] Move to `github.com/Thread/Slider` or similar
+ - [ ] Create as Swift Package
+ - [ ] Open source
 
 In the future we may add:
 
- - [] Snapshot tests to compare to the system `UISlider` on various device screen scales
- - [] Fix width being different to `UISlider`
- - [] Support different images per-state
- - [] API mirroring with `UISlider`. Other than `value` property this should be possible.
+ - [ ] Snapshot tests to compare to the system `UISlider` on various device screen scales
+ - [ ] Fix width being different to `UISlider`
+ - [ ] Support different images per-state
+ - [ ] API mirroring with `UISlider`. Other than `value` property this should be possible
    - Another option is to make `value` the result of `upperValue` - `lowerValue`
- - [] Support a single thumb
- - [] Support any number of thumbs
- - [] Accessibility support
+ - [ ] Support a single thumb
+ - [ ] Support any number of thumbs
+ - [ ] Accessibility support
