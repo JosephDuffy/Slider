@@ -48,6 +48,7 @@ open class ThumbImageView: UIImageView {
 //@IBDesignable 
 open class Slider: UIControl {
 
+    /// The tint colour of the minimum value track.
     open var minimumTrackTintColor: UIColor? {
         get {
             return minimumTrackView.tintColor
@@ -57,39 +58,50 @@ open class Slider: UIControl {
         }
     }
 
+    /// The current value of the lower thumb.
     @IBInspectable
     open var lowerValue: Float = 0.25
 
+    /// The current value of the upper thumb.
     @IBInspectable
     open var upperValue: Float = 0.75
 
+    /// The minimum value that the lower thumb can be set to.
     @IBInspectable
     open var minimumValue: Float = 0
 
+    /// The maximum value that the upper thumb can be set to.
     @IBInspectable
     open var maximumValue: Float = 1
 
-    /// A number in the range 0...100
+    /// The current value of the lower thumb, represented as a percentage of the available range. This value will be in
+    /// the range 0...100.
     open var lowerValueAsPercentage: Float {
         let range = maximumValue - minimumValue
         return (lowerValue - minimumValue) / range
     }
 
-    /// A number in the range 0...100
+    /// The current value of the lower thumb, represented as a percentage of the available range. This value will be in
+    /// the range 0...100.
     open var upperValueAsPercentage: Float {
         let range = maximumValue - minimumValue
         return (upperValue - minimumValue) / range
     }
 
-    open var minimumThumbDistance: CGFloat {
-        return currentThumbImage.size.width
+    /// The minimum width between the center of each of the thumbs.
+    open var minimumThumbsDistance: Float {
+        return Float(lowerThumbView.bounds.width)
     }
 
-    open var minimumValueDistance: Float {
-        return valueChangePerPoint * Float(lowerThumbView.bounds.width)
+    /// The minimum difference between the `lowerValue` and `upperValue`. This is restricted by the UI, so a wider
+    /// slider will have a smaller minimum value difference.
+    open var minimumValueDifference: Float {
+        return valueChangePerPoint * minimumThumbsDistance
     }
 
-    private var valueChangePerPoint: Float {
+    /// The difference in value that a single point movement of the thumb represents. This will be the minimum change
+    /// that can occur.
+    public var valueChangePerPoint: Float {
         let range = maximumValue - minimumValue
         return range/Float(thumbTrackBoundingRect.width)
     }
@@ -188,11 +200,11 @@ open class Slider: UIControl {
     }
 
     @objc private func lowerThumbViewGesture(_ recognizer: UIPanGestureRecognizer) {
-        handleGesture(recognizer: recognizer, value: &lowerValue, allowedRange: minimumValue...(upperValue - minimumValueDistance))
+        handleGesture(recognizer: recognizer, value: &lowerValue, allowedRange: minimumValue...(upperValue - minimumValueDifference))
     }
 
     @objc private func upperThumbViewGesture(_ recognizer: UIPanGestureRecognizer) {
-        handleGesture(recognizer: recognizer, value: &upperValue, allowedRange: (lowerValue + minimumValueDistance)...maximumValue)
+        handleGesture(recognizer: recognizer, value: &upperValue, allowedRange: (lowerValue + minimumValueDifference)...maximumValue)
     }
 
     private func handleGesture(recognizer: UIPanGestureRecognizer, value: inout Float, allowedRange: ClosedRange<Float>) {
