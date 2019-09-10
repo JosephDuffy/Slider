@@ -155,23 +155,12 @@ open class Slider: UIControl {
 
         position(thumb: lowerThumbView, percent: CGFloat(lowerValueAsPercentage))
         position(thumb: upperThumbView, percent: CGFloat(upperValueAsPercentage))
-
-//        let lowerThumbX = thumbTrackBoundingRect.width * CGFloat(lowerValueAsPercentage)
-//        lowerThumbView.center = CGPoint(x: lowerThumbX, y: minimumTrackView.frame.midY)
-//        let upperThumbX = thumbTrackBoundingRect.width * CGFloat(upperValueAsPercentage)
-//        upperThumbView.center = CGPoint(x: upperThumbX, y: minimumTrackView.frame.midY)
     }
 
     private func position(thumb: UIImageView, percent: CGFloat) {
-        print("-----")
-        print("percent", percent)
         let trackWidth = thumbTrackBoundingRect.width
-        print("trackWidth", trackWidth)
         let xOffset = trackWidth * percent
-        print("xOffset", xOffset)
-        print("minimumTrackView.frame.minX", thumbTrackBoundingRect.minX)
         let midX = thumbTrackBoundingRect.minX + xOffset
-        print("midX", midX)
         thumb.center = CGPoint(x: midX, y: minimumTrackView.frame.midY)
     }
 
@@ -184,8 +173,10 @@ open class Slider: UIControl {
         addSubview(lowerThumbView)
         addSubview(upperThumbView)
         minimumTrackView.tintColor = tintColor
+        minimumTrackView.clipsToBounds = true
         maximumTrackView.tintColor = .gray
-//        lowerThumbView.contentMode = .
+        maximumTrackView.clipsToBounds = true
+        maximumTrackView.isHidden = true
         lowerThumbView.isUserInteractionEnabled = true
         upperThumbView.isUserInteractionEnabled = true
 
