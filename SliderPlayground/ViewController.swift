@@ -142,7 +142,7 @@ open class Slider: UIControl {
 
     private var thumbTrackBoundingRect: CGRect {
         let visualWidth = bounds.width - (lowerThumbView.bounds.width / 2)
-        let trackWidth = minimumTrackView.bounds.width
+        let trackWidth = trackRect(forBounds: bounds).width
         let availableWidth = min(visualWidth, trackWidth)
         let widthDifference = bounds.width - availableWidth
         assert(widthDifference >= 0, "Thumb track bounding rect should never be greater than the bounds")
@@ -165,7 +165,7 @@ open class Slider: UIControl {
         let trackWidth = thumbTrackBoundingRect.width
         let xOffset = trackWidth * percent
         let midX = thumbTrackBoundingRect.minX + xOffset
-        thumb.center = CGPoint(x: midX, y: minimumTrackView.frame.midY)
+        thumb.center = CGPoint(x: midX, y: thumbTrackBoundingRect.midY)
     }
 
     private func addSubviews() {
