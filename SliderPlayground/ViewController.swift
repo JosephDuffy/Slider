@@ -127,10 +127,29 @@ open class Slider: UIControl {
     open override func layoutSubviews() {
         super.layoutSubviews()
 
+        layoutMinimumSlider()
+        layoutMaximumTrackView()
+        layoutThumbView()
+    }
+
+    private func layoutMaximumTrackView() {
+        let backgroundTrackRect = trackRect(forBounds: bounds)
+        maximumTrackView.frame = backgroundTrackRect
+    }
+
+    private func layoutMinimumSlider() {
         let backgroundTrackRect = trackRect(forBounds: bounds)
         minimumTrackView.frame = backgroundTrackRect
-        maximumTrackView.frame = backgroundTrackRect
-        layoutThumbView()
+        let trackWidth = thumbTrackBoundingRect.width
+
+        let percentageDifference = upperValueAsPercentage - lowerValueAsPercentage
+        let minimumTrackWidth = trackWidth * CGFloat(percentageDifference)
+        minimumTrackView.frame.size.width = minimumTrackWidth
+
+        let xOffset = trackWidth * CGFloat(lowerValueAsPercentage)
+        let minX = thumbTrackBoundingRect.minX + xOffset
+        minimumTrackView.frame.origin.x = minX
+
     }
 
     open override var intrinsicContentSize: CGSize {
@@ -171,16 +190,17 @@ open class Slider: UIControl {
     private func addSubviews() {
         updateThumbImages()
         updateMinimumTrackImage()
+        updateMaximumTrackImage()
 
-        addSubview(minimumTrackView)
         addSubview(maximumTrackView)
+        addSubview(minimumTrackView)
         addSubview(lowerThumbView)
         addSubview(upperThumbView)
         minimumTrackView.tintColor = tintColor
         minimumTrackView.clipsToBounds = true
-        maximumTrackView.tintColor = .gray
+        maximumTrackView.tintColor = .lightGray
         maximumTrackView.clipsToBounds = true
-        maximumTrackView.isHidden = true
+//        maximumTrackView.isHidden = true
         lowerThumbView.isUserInteractionEnabled = true
         upperThumbView.isUserInteractionEnabled = true
 
@@ -235,6 +255,7 @@ open class Slider: UIControl {
 
     private(set) lazy var currentThumbImage: UIImage = Slider.defaultThumbImage()
     private(set) lazy var currentMinimumTrackImage: UIImage = Slider.defaultMinimumValueImage()
+    private(set) lazy var currentMaximumTrackImage: UIImage = Slider.defaultMaximumValueImage()
 
     open func trackRect(forBounds bounds: CGRect) -> CGRect {
         var rect = bounds
@@ -260,6 +281,11 @@ open class Slider: UIControl {
 
     private func updateMinimumTrackImage() {
         minimumTrackView.image = currentMinimumTrackImage
+        setNeedsLayout()
+    }
+
+    private func updateMaximumTrackImage() {
+        maximumTrackView.image = currentMaximumTrackImage
         setNeedsLayout()
     }
 
