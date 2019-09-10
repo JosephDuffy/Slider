@@ -37,6 +37,7 @@ In the future we may add:
  - [ ] Snapshot tests to compare to the system `UISlider` on various device screen scales
  - [ ] Fix width being different to `UISlider`
  - [ ] Support different images per-state
+ - [ ] `IBDesignable` support
  - [ ] API mirroring with `UISlider`. Other than `value` property this should be possible
    - Another option is to make `value` the result of `upperValue` - `lowerValue`
  - [ ] Support a single thumb
