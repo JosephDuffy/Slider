@@ -29,7 +29,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ccP-M9-PRg" customClass="Slider" customModule="SliderPlayground" customModuleProvider="target">
-                                <rect key="frame" x="53" y="113" width="345" height="288"/>
+                                <rect key="frame" x="16" y="113" width="382" height="288"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
                         </subviews>
@@ -42,7 +42,7 @@
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="uCw-8j-HLY" secondAttribute="trailing" constant="16" id="f1k-WD-D8X"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="ccP-M9-PRg" secondAttribute="trailing" constant="16" id="l7i-wT-upb"/>
                             <constraint firstItem="uCw-8j-HLY" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="16" id="mNF-GJ-ZPl"/>
-                            <constraint firstItem="ccP-M9-PRg" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="53" id="mXt-B1-THT"/>
+                            <constraint firstItem="ccP-M9-PRg" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="16" id="mXt-B1-THT"/>
                             <constraint firstItem="V17-b7-qBb" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="16" placeholder="YES" id="ncU-VR-2rr"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
