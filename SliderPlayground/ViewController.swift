@@ -243,12 +243,9 @@ open class Slider: UIControl {
 
     open func trackRect(forBounds bounds: CGRect) -> CGRect {
         var rect = bounds
-        rect = rect.insetBy(dx: 4, dy: 0)
-        rect.origin.y = bounds.midY - 1
-        rect.size.height = 2// currentMinimumTrackImage.size.height / (window?.screen ?? .main).nativeScale
-
-        print("(window?.screen ?? .main).nativeScale", (window?.screen ?? .main).nativeScale)
-        print("currentMinimumTrackImage.size.height", currentMinimumTrackImage.size.height)
+        rect = rect.insetBy(dx: 2, dy: 0)
+        rect.origin.y = bounds.midY.rounded(.down)
+        rect.size.height = currentMinimumTrackImage.size.height
         return rect
     }
 
