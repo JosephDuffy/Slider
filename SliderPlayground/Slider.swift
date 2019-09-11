@@ -156,7 +156,6 @@ open class Slider: UIControl {
         addSubview(upperThumbView)
         foregroundTrackView.tintColor = tintColor
         foregroundTrackView.clipsToBounds = true
-        backgroundTrackView.tintColor = .lightGray
         backgroundTrackView.clipsToBounds = true
         lowerThumbView.isUserInteractionEnabled = true
         upperThumbView.isUserInteractionEnabled = true

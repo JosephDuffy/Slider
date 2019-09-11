@@ -23,7 +23,7 @@ Eventually I would love for the project to be open-source, but for now I think i
 
 A rough roadmap that I would say moves us to a 1.0 would be:
 
- - [ ] Fix slider tracks slicing
+ - [X] Fix slider tracks slicing
  - [ ] Increase tap area of thumbs
  - [ ] Tests for the scaling options
  - [ ] Move to `github.com/Thread/Slider` or similar

@@ -9,7 +9,7 @@
         "mode" : "3-part-horizontal",
         "center" : {
           "mode" : "tile",
-          "width" : 1
+          "width" : 4
         },
         "cap-insets" : {
           "right" : 0,
@@ -17,12 +17,23 @@
         }
       },
       "idiom" : "universal",
-      "filename" : "minimumValueImage@2x.png",
+      "filename" : "sliderForeground@2x.png",
       "scale" : "2x"
     },
     {
+      "resizing" : {
+        "mode" : "3-part-horizontal",
+        "center" : {
+          "mode" : "tile",
+          "width" : 6
+        },
+        "cap-insets" : {
+          "right" : 0,
+          "left" : 3
+        }
+      },
       "idiom" : "universal",
-      "filename" : "minimumValueImage@3x.png",
+      "filename" : "sliderForeground@3x.png",
       "scale" : "3x"
     }
   ],
