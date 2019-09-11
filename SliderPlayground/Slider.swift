@@ -180,7 +180,24 @@ open class Slider: UIControl {
         switch recognizer.state {
         case .changed, .ended:
             let point = recognizer.translation(in: self)
+
+            // Nothing needs to be done if the movement was not big enough to register as a translation
+            guard point.x != 0 else { return }
+
+            // Nothing needs to be done if the thumb is already at its min or max position and the change
+            // would move it past this point
+            if value == allowedRange.upperBound && point.x > 0 {
+                return
+            } else if value == allowedRange.lowerBound && point.x < 0 {
+                return
+            }
+
             value += Float(point.x) * valueChangePerPoint
+
+            // Ensure that the value has not been moved out of the allowable range. The check above
+            // ensures it will not be changes once at the extreme, but them ensures a single change doesn't
+            // move it past an extreme, e.g. current = 0.99, max = 1.0, change = 0.02 would set value to 1.01
+            // then this would clamp it to 1.0
             if value > allowedRange.upperBound {
                 value = allowedRange.upperBound
             } else if value < allowedRange.lowerBound {
