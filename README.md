@@ -25,7 +25,6 @@ A rough roadmap that I would say moves us to a 1.0 would be:
 
  - [ ] Fix slider tracks slicing
  - [ ] Increase tap area of thumbs
- - [ ] Fix shadow of thumb being clipped
  - [ ] Tests for the scaling options
  - [ ] Move to `github.com/Thread/Slider` or similar
  - [ ] Create as Swift Package
