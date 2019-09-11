@@ -296,15 +296,15 @@ open class Slider: UIControl {
 extension Slider {
 
     internal static func defaultForegroundValueImage() -> UIImage {
-        return UIImage(named: "foregroundSliderImage")!
+        return UIImage(named: "foregroundSliderImage", in: Bundle(for: Slider.self), compatibleWith: nil)!
     }
 
     internal static func defaultBackgroundValueImage() -> UIImage {
-        return UIImage(named: "backgroundSliderImage")!
+        return UIImage(named: "backgroundSliderImage", in: Bundle(for: Slider.self), compatibleWith: nil)!
     }
 
     internal static func defaultThumbImage() -> UIImage {
-        return UIImage(named: "thumb")!
+        return UIImage(named: "thumb", in: Bundle(for: Slider.self), compatibleWith: nil)!
     }
 
 }
