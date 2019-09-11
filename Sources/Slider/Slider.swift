@@ -12,11 +12,21 @@ open class Slider: UIControl {
         }
     }
 
-    /// The current value of the lower thumb.
-    open var lowerValue: Float = 0.25
+    /// The current value of the lower thumb. This value is pinned `lowerValueRange`.
+    open var lowerValue: Float = 0.25 {
+        didSet {
+            sanitise(value: &lowerValue, allowedRange: lowerValueRange)
+            setNeedsLayout()
+        }
+    }
 
-    /// The current value of the upper thumb.
-    open var upperValue: Float = 0.75
+    /// The current value of the upper thumb. This value is pinned `upperValueRange`.
+    open var upperValue: Float = 0.75 {
+        didSet {
+            sanitise(value: &upperValue, allowedRange: upperValueRange)
+            setNeedsLayout()
+        }
+    }
 
     /// The minimum value that the lower thumb can be set to.
     open var minimumValue: Float = 0
@@ -47,6 +57,18 @@ open class Slider: UIControl {
     /// slider will have a smaller minimum value difference.
     open var minimumValueDifference: Float {
         return valueChangePerPoint * minimumThumbsDistance
+    }
+
+    /// The allowed range of the lower value. This takes in to account the available visual space of the slider; the
+    /// upper bound will be less than the `upperValue`.
+    public var lowerValueRange: ClosedRange<Float> {
+        return minimumValue...(upperValue - minimumValueDifference)
+    }
+
+    /// The allowed range of the upper value. This takes in to account the available visual space of the slider; the
+    /// lower bound will be greater than the `lowerValue`.
+    public var upperValueRange: ClosedRange<Float> {
+        return (lowerValue + minimumValueDifference)...maximumValue
     }
 
     /// The difference in value that a single point movement of the thumb represents. This will be the minimum change
@@ -168,11 +190,23 @@ open class Slider: UIControl {
     }
 
     @objc private func lowerThumbViewGesture(_ recognizer: UIPanGestureRecognizer) {
-        handleGesture(recognizer: recognizer, value: &lowerValue, allowedRange: minimumValue...(upperValue - minimumValueDifference))
+        handleGesture(recognizer: recognizer, value: &lowerValue, allowedRange: lowerValueRange)
     }
 
     @objc private func upperThumbViewGesture(_ recognizer: UIPanGestureRecognizer) {
-        handleGesture(recognizer: recognizer, value: &upperValue, allowedRange: (lowerValue + minimumValueDifference)...maximumValue)
+        handleGesture(recognizer: recognizer, value: &upperValue, allowedRange: upperValueRange)
+    }
+
+    private func sanitise(value: inout Float, allowedRange: ClosedRange<Float>) {
+        // Ensure that the value has not been moved out of the allowable range. The check above
+        // ensures it will not be changes once at the extreme, but them ensures a single change doesn't
+        // move it past an extreme, e.g. current = 0.99, max = 1.0, change = 0.02 would set value to 1.01
+        // then this would clamp it to 1.0
+        if value > allowedRange.upperBound {
+            value = allowedRange.upperBound
+        } else if value < allowedRange.lowerBound {
+            value = allowedRange.lowerBound
+        }
     }
 
     private func handleGesture(recognizer: UIPanGestureRecognizer, value: inout Float, allowedRange: ClosedRange<Float>) {
@@ -192,25 +226,13 @@ open class Slider: UIControl {
             }
 
             value += Float(point.x) * valueChangePerPoint
-
-            // Ensure that the value has not been moved out of the allowable range. The check above
-            // ensures it will not be changes once at the extreme, but them ensures a single change doesn't
-            // move it past an extreme, e.g. current = 0.99, max = 1.0, change = 0.02 would set value to 1.01
-            // then this would clamp it to 1.0
-            if value > allowedRange.upperBound {
-                value = allowedRange.upperBound
-            } else if value < allowedRange.lowerBound {
-                value = allowedRange.lowerBound
-            }
+            recognizer.setTranslation(.zero, in: self)
 
             // The above checks ensure the min and max values will only be hit once so firing the haptics
             // will only occur once when reaching the end
             if value == minimumValue || value == maximumValue {
                 UISelectionFeedbackGenerator().selectionChanged()
             }
-
-            recognizer.setTranslation(.zero, in: self)
-            setNeedsLayout()
         case .cancelled:
             // TODO: Reset to start
             break
