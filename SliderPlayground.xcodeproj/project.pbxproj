@@ -7,16 +7,55 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D91C336823293BA500B63864 /* Slider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D91C336223293B8C00B63864 /* Slider.framework */; };
+		D91C336923293BA500B63864 /* Slider.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D91C336223293B8C00B63864 /* Slider.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D97386CF22E084C800B645E9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D97386CE22E084C800B645E9 /* AppDelegate.swift */; };
 		D97386D122E084C800B645E9 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D97386D022E084C800B645E9 /* ViewController.swift */; };
 		D97386D422E084C800B645E9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D97386D222E084C800B645E9 /* Main.storyboard */; };
 		D97386D622E084CA00B645E9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D97386D522E084CA00B645E9 /* Assets.xcassets */; };
 		D97386D922E084CA00B645E9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D97386D722E084CA00B645E9 /* LaunchScreen.storyboard */; };
-		D99FAD6A232804AA001B2D0C /* Slider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D99FAD69232804AA001B2D0C /* Slider.swift */; };
-		D99FAD6C232804E3001B2D0C /* UIImageView+thumbImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D99FAD6B232804E3001B2D0C /* UIImageView+thumbImageView.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		D91C336123293B8C00B63864 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D91C335C23293B8C00B63864 /* Slider.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D91C33382329375300B63864;
+			remoteInfo = Slider;
+		};
+		D91C336323293B8C00B63864 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D91C335C23293B8C00B63864 /* Slider.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D91C33412329375300B63864;
+			remoteInfo = SliderTests;
+		};
+		D91C336A23293BA500B63864 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D91C335C23293B8C00B63864 /* Slider.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = D91C33372329375300B63864;
+			remoteInfo = Slider;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		D91C336C23293BA500B63864 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				D91C336923293BA500B63864 /* Slider.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		D91C335C23293B8C00B63864 /* Slider.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Slider.xcodeproj; sourceTree = "<group>"; };
 		D97386CB22E084C800B645E9 /* SliderPlayground.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SliderPlayground.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D97386CE22E084C800B645E9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D97386D022E084C800B645E9 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -24,8 +63,6 @@
 		D97386D522E084CA00B645E9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D97386D822E084CA00B645E9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		D97386DA22E084CA00B645E9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		D99FAD69232804AA001B2D0C /* Slider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Slider.swift; sourceTree = "<group>"; };
-		D99FAD6B232804E3001B2D0C /* UIImageView+thumbImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImageView+thumbImageView.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -33,15 +70,26 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D91C336823293BA500B63864 /* Slider.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D91C335D23293B8C00B63864 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D91C336223293B8C00B63864 /* Slider.framework */,
+				D91C336423293B8C00B63864 /* SliderTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		D97386C222E084C800B645E9 = {
 			isa = PBXGroup;
 			children = (
+				D91C335C23293B8C00B63864 /* Slider.xcodeproj */,
 				D97386CD22E084C800B645E9 /* SliderPlayground */,
 				D97386CC22E084C800B645E9 /* Products */,
 			);
@@ -60,8 +108,6 @@
 			children = (
 				D97386CE22E084C800B645E9 /* AppDelegate.swift */,
 				D97386D022E084C800B645E9 /* ViewController.swift */,
-				D99FAD69232804AA001B2D0C /* Slider.swift */,
-				D99FAD6B232804E3001B2D0C /* UIImageView+thumbImageView.swift */,
 				D97386D222E084C800B645E9 /* Main.storyboard */,
 				D97386D522E084CA00B645E9 /* Assets.xcassets */,
 				D97386D722E084CA00B645E9 /* LaunchScreen.storyboard */,
@@ -80,10 +126,12 @@
 				D97386C722E084C800B645E9 /* Sources */,
 				D97386C822E084C800B645E9 /* Frameworks */,
 				D97386C922E084C800B645E9 /* Resources */,
+				D91C336C23293BA500B63864 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				D91C336B23293BA500B63864 /* PBXTargetDependency */,
 			);
 			name = SliderPlayground;
 			productName = SliderPlayground;
@@ -98,7 +146,7 @@
 			attributes = {
 				LastSwiftUpdateCheck = 1020;
 				LastUpgradeCheck = 1020;
-				ORGANIZATIONNAME = "Joseph Duffy";
+				ORGANIZATIONNAME = Thread;
 				TargetAttributes = {
 					D97386CA22E084C800B645E9 = {
 						CreatedOnToolsVersion = 10.2.1;
@@ -116,12 +164,35 @@
 			mainGroup = D97386C222E084C800B645E9;
 			productRefGroup = D97386CC22E084C800B645E9 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = D91C335D23293B8C00B63864 /* Products */;
+					ProjectRef = D91C335C23293B8C00B63864 /* Slider.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				D97386CA22E084C800B645E9 /* SliderPlayground */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		D91C336223293B8C00B63864 /* Slider.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Slider.framework;
+			remoteRef = D91C336123293B8C00B63864 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		D91C336423293B8C00B63864 /* SliderTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = SliderTests.xctest;
+			remoteRef = D91C336323293B8C00B63864 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		D97386C922E084C800B645E9 /* Resources */ = {
@@ -141,14 +212,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D99FAD6C232804E3001B2D0C /* UIImageView+thumbImageView.swift in Sources */,
 				D97386D122E084C800B645E9 /* ViewController.swift in Sources */,
-				D99FAD6A232804AA001B2D0C /* Slider.swift in Sources */,
 				D97386CF22E084C800B645E9 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D91C336B23293BA500B63864 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Slider;
+			targetProxy = D91C336A23293BA500B63864 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		D97386D222E084C800B645E9 /* Main.storyboard */ = {
@@ -289,6 +366,7 @@
 		D97386DE22E084CA00B645E9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = XD2B49EJ3F;
@@ -307,6 +385,7 @@
 		D97386DF22E084CA00B645E9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = XD2B49EJ3F;

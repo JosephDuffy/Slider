@@ -1,11 +1,3 @@
-//
-//  AppDelegate.swift
-//  SliderPlayground
-//
-//  Created by Joseph Duffy on 18/07/2019.
-//  Copyright © 2019 Joseph Duffy. All rights reserved.
-//
-
 import UIKit
 
 @UIApplicationMain

@@ -112,7 +112,7 @@ open class Slider: UIControl {
 
     open override var intrinsicContentSize: CGSize {
         var size = super.intrinsicContentSize
-        size.height = 31
+        size.height = 30
         size.width += 4
         return size
     }
