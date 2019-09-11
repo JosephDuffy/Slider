@@ -29,10 +29,20 @@ open class Slider: UIControl {
     }
 
     /// The minimum value that the lower thumb can be set to.
-    open var minimumValue: Float = 0
+    open var minimumValue: Float = 0 {
+        didSet {
+            sanitise(value: &lowerValue, allowedRange: lowerValueRange)
+            setNeedsLayout()
+        }
+    }
 
     /// The maximum value that the upper thumb can be set to.
-    open var maximumValue: Float = 1
+    open var maximumValue: Float = 1 {
+        didSet {
+            sanitise(value: &upperValue, allowedRange: upperValueRange)
+            setNeedsLayout()
+        }
+    }
 
     /// The current value of the lower thumb, represented as a percentage of the available range. This value will be in
     /// the range 0...100.
