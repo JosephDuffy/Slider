@@ -238,6 +238,8 @@ open class Slider: UIControl {
             value += Float(point.x) * valueChangePerPoint
             recognizer.setTranslation(.zero, in: self)
 
+            sendActions(for: .valueChanged)
+
             // The above checks ensure the min and max values will only be hit once so firing the haptics
             // will only occur once when reaching the end
             if value == minimumValue || value == maximumValue {
