@@ -203,6 +203,13 @@ open class Slider: UIControl {
             } else if value < allowedRange.lowerBound {
                 value = allowedRange.lowerBound
             }
+
+            // The above checks ensure the min and max values will only be hit once so firing the haptics
+            // will only occur once when reaching the end
+            if value == minimumValue || value == maximumValue {
+                UISelectionFeedbackGenerator().selectionChanged()
+            }
+
             recognizer.setTranslation(.zero, in: self)
             setNeedsLayout()
         case .cancelled:
