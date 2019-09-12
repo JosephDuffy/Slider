@@ -47,6 +47,7 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <connections>
+                        <outlet property="label" destination="V17-b7-qBb" id="0pu-Ny-VUb"/>
                         <outlet property="slider" destination="ccP-M9-PRg" id="B4E-Yw-x55"/>
                         <outlet property="uiSlider" destination="uCw-8j-HLY" id="kFX-A6-LdJ"/>
                     </connections>
