@@ -100,12 +100,29 @@ open class Slider: UIControl {
         }
     }
 
+    open override var intrinsicContentSize: CGSize {
+        var size = super.intrinsicContentSize
+        size.height = 30
+        size.width += 4
+        return size
+    }
+
+    open override var isHighlighted: Bool {
+        didSet {
+            updateThumbImages()
+        }
+    }
+
     public var log: OSLog?
 
     private let foregroundTrackView = UIImageView(image: nil)
     private let backgroundTrackView = UIImageView(image: nil)
     private let lowerThumbView = UIImageView.thumbImageView(image: nil)
     private let upperThumbView = UIImageView.thumbImageView(image: nil)
+
+    private(set) lazy var currentThumbImage: UIImage = Slider.defaultThumbImage()
+    private(set) lazy var currentMinimumTrackImage: UIImage = Slider.defaultForegroundValueImage()
+    private(set) lazy var currentMaximumTrackImage: UIImage = Slider.defaultBackgroundValueImage()
 
     public override init(frame: CGRect) {
         super.init(frame: frame)
@@ -136,6 +153,26 @@ open class Slider: UIControl {
         layoutThumbView()
     }
 
+    open func copyStyle(of slider: UISlider) {
+        tintColor = slider.tintColor
+    }
+
+    public func setThumbImage(_ image: UIImage?, for state: UIControl.State) {
+        thumbImages[state.rawValue] = image
+
+        if self.state == state {
+            updateThumbImages()
+        }
+    }
+
+    open func trackRect(forBounds bounds: CGRect) -> CGRect {
+        var rect = bounds
+        rect = rect.insetBy(dx: 2, dy: 0)
+        rect.origin.y = bounds.midY.rounded(.down)
+        rect.size.height = currentMinimumTrackImage.size.height
+        return rect
+    }
+
     private func layoutBackgroundTrackView() {
         let backgroundTrackRect = trackRect(forBounds: bounds)
         backgroundTrackView.frame = backgroundTrackRect
@@ -154,13 +191,6 @@ open class Slider: UIControl {
         let minX = thumbTrackBoundingRect.minX + xOffset
         foregroundTrackView.frame.origin.x = minX
 
-    }
-
-    open override var intrinsicContentSize: CGSize {
-        var size = super.intrinsicContentSize
-        size.height = 30
-        size.width += 4
-        return size
     }
 
     private var thumbTrackBoundingRect: CGRect {
@@ -269,36 +299,6 @@ open class Slider: UIControl {
             break
         @unknown default:
             break
-        }
-    }
-
-    open func copyStyle(of slider: UISlider) {
-        tintColor = slider.tintColor
-    }
-
-    func setThumbImage(_ image: UIImage?, for state: UIControl.State) {
-        thumbImages[state.rawValue] = image
-
-        if self.state == state {
-            updateThumbImages()
-        }
-    }
-
-    private(set) lazy var currentThumbImage: UIImage = Slider.defaultThumbImage()
-    private(set) lazy var currentMinimumTrackImage: UIImage = Slider.defaultForegroundValueImage()
-    private(set) lazy var currentMaximumTrackImage: UIImage = Slider.defaultBackgroundValueImage()
-
-    open func trackRect(forBounds bounds: CGRect) -> CGRect {
-        var rect = bounds
-        rect = rect.insetBy(dx: 2, dy: 0)
-        rect.origin.y = bounds.midY.rounded(.down)
-        rect.size.height = currentMinimumTrackImage.size.height
-        return rect
-    }
-
-    open override var isHighlighted: Bool {
-        didSet {
-            updateThumbImages()
         }
     }
 
