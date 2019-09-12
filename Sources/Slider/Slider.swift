@@ -236,6 +236,7 @@ open class Slider: UIControl {
             }
 
             value += Float(point.x) * valueChangePerPoint
+            sanitise(value: &value, allowedRange: allowedRange)
             recognizer.setTranslation(.zero, in: self)
 
             sendActions(for: .valueChanged)
