@@ -11,6 +11,7 @@ class ViewController: UIViewController {
         super.viewDidLoad()
 
         slider.log = OSLog(subsystem: "com.thread.SliderPlayground", category: "slider")
+        slider.tintColor = .red
     }
 
 }

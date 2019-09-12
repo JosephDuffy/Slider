@@ -3,16 +3,6 @@ import os.log
 
 open class Slider: UIControl {
 
-    /// The tint colour of the minimum value track.
-    open var minimumTrackTintColor: UIColor? {
-        get {
-            return foregroundTrackView.tintColor
-        }
-        set {
-            foregroundTrackView.tintColor = newValue
-        }
-    }
-
     /// The current value of the lower thumb. This value is pinned `lowerValueRange`.
     open var lowerValue: Float = 0.25 {
         didSet {
@@ -87,6 +77,27 @@ open class Slider: UIControl {
     public var valueChangePerPoint: Float {
         let range = maximumValue - minimumValue
         return range/Float(thumbTrackBoundingRect.width)
+    }
+
+    /// The tint colour of the foreground track.
+    open override var tintColor: UIColor! {
+        set {
+            foregroundTrackView.tintColor = newValue
+            super.tintColor = newValue
+        }
+        get {
+            return super.tintColor
+        }
+    }
+
+    /// The tint colour of the background track.
+    open var minimumTrackTintColor: UIColor? {
+        get {
+            return backgroundTrackView.tintColor
+        }
+        set {
+            backgroundTrackView.tintColor = newValue
+        }
     }
 
     public var log: OSLog?
