@@ -246,11 +246,11 @@ open class Slider: UIControl {
     }
 
     @objc private func lowerThumbViewGesture(_ recognizer: UIPanGestureRecognizer) {
-        handleGesture(recognizer: recognizer, value: &lowerValue, allowedRange: lowerValueRange)
+        handleGesture(recognizer: recognizer, value: \.lowerValue, allowedRange: lowerValueRange)
     }
 
     @objc private func upperThumbViewGesture(_ recognizer: UIPanGestureRecognizer) {
-        handleGesture(recognizer: recognizer, value: &upperValue, allowedRange: upperValueRange)
+        handleGesture(recognizer: recognizer, value: \.upperValue, allowedRange: upperValueRange)
     }
 
     private func sanitise(value: inout Float, allowedRange: ClosedRange<Float>) {
@@ -269,7 +269,16 @@ open class Slider: UIControl {
         }
     }
 
-    private func handleGesture(recognizer: UIPanGestureRecognizer, value: inout Float, allowedRange: ClosedRange<Float>) {
+    private func handleGesture(recognizer: UIPanGestureRecognizer, value valueKeyPath: ReferenceWritableKeyPath<Slider, Float>, allowedRange: ClosedRange<Float>) {
+        var value: Float {
+            get {
+                return self[keyPath: valueKeyPath]
+            }
+            set {
+                self[keyPath: valueKeyPath] = newValue
+            }
+        }
+
         switch recognizer.state {
         case .changed, .ended:
             let point = recognizer.translation(in: self)
@@ -286,7 +295,6 @@ open class Slider: UIControl {
             }
 
             value += Float(point.x) * valueChangePerPoint
-            sanitise(value: &value, allowedRange: allowedRange)
             log("Value updated to %{public}@", type: .debug, "\(value)")
             recognizer.setTranslation(.zero, in: self)
 
