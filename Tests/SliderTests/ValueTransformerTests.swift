@@ -23,4 +23,27 @@ final class ValueTransformerTests: XCTestCase {
         XCTAssertEqual(valueTransformer.value(for: .external), 60, accuracy: minimumAccuracy)
     }
 
+    func testStep() {
+        var valueTransformer = ValueTransformer(internalValue: 50, step: 0.1, scaling: .linear(0...100))
+        XCTAssertEqual(valueTransformer.value(for: .external), 50, accuracy: minimumAccuracy)
+
+        valueTransformer.set(value: 60.1, from: .external)
+        XCTAssertEqual(valueTransformer.value(for: .external), 60.1, accuracy: minimumAccuracy)
+
+        valueTransformer.set(value: 60.09, from: .external)
+        XCTAssertEqual(valueTransformer.value(for: .external), 60.1, accuracy: minimumAccuracy)
+
+        valueTransformer.set(value: 60.05, from: .external)
+        XCTAssertEqual(valueTransformer.value(for: .external), 60.1, accuracy: minimumAccuracy)
+
+        valueTransformer.set(value: 60.04, from: .external)
+        XCTAssertEqual(valueTransformer.value(for: .external), 60, accuracy: minimumAccuracy)
+
+        valueTransformer.maximumPercent = 40.14
+        XCTAssertEqual(valueTransformer.value(for: .external), 40.1, accuracy: minimumAccuracy)
+
+        valueTransformer.maximumPercent = 40.19
+        XCTAssertEqual(valueTransformer.value(for: .external), 40.1, accuracy: minimumAccuracy)
+    }
+
 }
