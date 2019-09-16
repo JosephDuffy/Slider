@@ -333,12 +333,6 @@ open class Slider: UIControl {
                 return
             }
 
-//            let changeAsPercentage = point.x / thumbTrackBoundingRect.width
-//            log("Slider was moved %{public}@, %{public}@%%", type: .debug, "\(point.x)", "\(changeAsPercentage)")
-//            log("Slider had value %{public}@ (internal); %{public}@ (external)", type: .debug, "\(self[keyPath: valueKeyPath].value(for: .internal))", "\(self[keyPath: valueKeyPath].value(for: .external))")
-////            self[keyPath: valueKeyPath] *= Float(changeAsPercentage)
-//            let multipedValue = self[keyPath: valueKeyPath] * Float(changeAsPercentage)
-//            self[keyPath: valueKeyPath] = multipedValue
             let internalValueChange = Float(point.x) * valueChangePerPoint
             log("internalValueChange %{public}@", type: .debug, "\(internalValueChange)")
             value += internalValueChange
