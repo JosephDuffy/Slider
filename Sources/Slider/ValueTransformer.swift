@@ -145,17 +145,3 @@ internal struct ValueTransformer {
     }
 
 }
-
-extension ValueTransformer {
-
-    static func * (lhs: ValueTransformer, rhs: Float) -> ValueTransformer {
-        var lhs = lhs
-        print("before", lhs.internalValue)
-        print("rhs", rhs)
-        print("lhs.internalValue * rhs", lhs.internalValue * rhs)
-        lhs.internalValue += lhs.internalValue * rhs
-        print("after", lhs.internalValue)
-        return lhs
-    }
-
-}
