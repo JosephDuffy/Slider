@@ -143,7 +143,12 @@ open class Slider: UIControl {
         }
     }
 
-    public var log: OSLog?
+    public var log: OSLog? {
+        didSet {
+            internalLowerValue.log = log
+            internalUpperValue.log = log
+        }
+    }
 
     private let foregroundTrackView = UIImageView(image: nil)
     private let backgroundTrackView = UIImageView(image: nil)

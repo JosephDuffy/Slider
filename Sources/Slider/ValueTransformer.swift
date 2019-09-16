@@ -1,4 +1,5 @@
 import Foundation
+import os.log
 
 internal struct ValueTransformer {
 
@@ -24,6 +25,7 @@ internal struct ValueTransformer {
         didSet {
             assert(minimumPercent >= 0, "Cannot set a negative minimum percent")
             assert(minimumPercent <= maximumPercent, "Cannot set a minimum percent greater than maximum percent")
+            log?.log("Minimum percent set to %{public}@%%", type: .debug, "\(minimumPercent)")
             sanitise()
         }
     }
@@ -33,6 +35,7 @@ internal struct ValueTransformer {
         didSet {
             assert(maximumPercent <= 100, "Cannot set a maximum percent greater than 100")
             assert(maximumPercent >= minimumPercent, "Cannot set a maximum percent less than minimum percent")
+            log?.log("Maximum percent set to %{public}@%%", type: .debug, "\(maximumPercent)")
             sanitise()
         }
     }
@@ -99,6 +102,8 @@ internal struct ValueTransformer {
     }
 
     private mutating func sanitise() {
+        log?.log("Sanitising %{public}@", type: .debug, "\(internalValue)")
+
         var value = internalValue
 
         var roundingRule: FloatingPointRoundingRule = .toNearestOrAwayFromZero
@@ -108,25 +113,31 @@ internal struct ValueTransformer {
         // move it past an extreme, e.g. current = 0.99, max = 1.0, change = 0.02 would set value to 1.01
         // then this would clamp it to 1.0
         if value > upperBound(for: .internal) {
+            log?.log("Value was great than upper bound %{public}@", type: .debug, "\(upperBound(for: .internal))")
             value = upperBound(for: .internal)
             roundingRule = .down
         } else if value < lowerBound(for: .internal) {
+            log?.log("Value was less than lower bound %{public}@", type: .debug, "\(lowerBound(for: .internal))")
             value = lowerBound(for: .internal)
             roundingRule = .up
         }
 
         if let step = step {
+            log?.log("Rounding to nearest %{public}@ using %{public}@", type: .debug, "\(step)", "\(roundingRule)")
             value = (Float(value)/step).rounded(roundingRule) * step
 
             if value > upperBound(for: .internal) {
                 log?.log("Value was great than upper bound after rounding %{public}@", type: .debug, "\(upperBound(for: .internal))")
                 value -= step
             } else if value < lowerBound(for: .internal) {
+                log?.log("Value was less than lower bound after rounding %{public}@", type: .debug, "\(lowerBound(for: .internal))")
                 value += step
             }
         }
 
         guard internalValue != value else { return }
+
+        log?.log("Sanitised value has changed from %{public}@ to %{public}@", type: .debug, "\(internalValue)", "\(value)")
 
         internalValue = value
     }
