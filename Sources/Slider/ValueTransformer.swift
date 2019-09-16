@@ -90,7 +90,7 @@ internal struct ValueTransformer {
         var value = internalValue
 
         if let step = step {
-            value = round(Float(value)/step) * step
+            value = (Float(value)/step).rounded() * step
         }
 
         // Ensure that the value has not been moved out of the allowable range. The check above
