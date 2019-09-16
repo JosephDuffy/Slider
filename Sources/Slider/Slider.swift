@@ -330,9 +330,9 @@ open class Slider: UIControl {
             }
 
             let internalValueChange = Float(point.x) * valueChangePerPoint
-            log("internalValueChange %{public}@", type: .debug, "\(internalValueChange)")
+            log?.log("internalValueChange %{public}@", type: .debug, "\(internalValueChange)")
             value += internalValueChange
-            log("Value updated to %{public}@", type: .debug, "\(value)")
+            log?.log("Value updated to %{public}@", type: .debug, "\(value)")
             recognizer.setTranslation(.zero, in: self)
             updateMinimumAndMaximumSliderValues()
 
@@ -341,7 +341,7 @@ open class Slider: UIControl {
             // The above checks ensure the min and max values will only be hit once so firing the haptics
             // will only occur once when reaching the end
             if value == internalLowerValue.lowerBound(for: .internal) || value == internalUpperValue.upperBound(for: .internal) {
-                log("Triggering selection changed haptics", type: .debug)
+                log?.log("Triggering selection changed haptics", type: .debug)
                 UISelectionFeedbackGenerator().selectionChanged()
             }
         case .cancelled:
@@ -370,26 +370,6 @@ open class Slider: UIControl {
     private func updateMaximumTrackImage() {
         backgroundTrackView.image = currentMaximumTrackImage
         setNeedsLayout()
-    }
-
-    private func log(_ message: StaticString, type: OSLogType, _ args: CVarArg...) {
-        guard let log = log else { return }
-        switch args.count {
-        case 0:
-            os_log(message, log: log, type: type)
-        case 1:
-            os_log(message, log: log, type: type, args[0])
-        case 2:
-            os_log(message, log: log, type: type, args[0], args[1])
-        case 3:
-            os_log(message, log: log, type: type, args[0], args[1], args[2])
-        case 4:
-            os_log(message, log: log, type: type, args[0], args[1], args[2], args[3])
-        default:
-            assertionFailure("Too many arguments passed to log. Update this to support this many arguments.")
-            os_log(message, log: log, type: type, args[0], args[1], args[2], args[3])
-        }
-
     }
 
 }

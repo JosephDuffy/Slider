@@ -15,6 +15,7 @@
 		D91C33702329481B00B63864 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D91C336F2329475D00B63864 /* Assets.xcassets */; };
 		D91C3373232BCF3D00B63864 /* Scaling.swift in Sources */ = {isa = PBXBuildFile; fileRef = D91C3372232BCF3D00B63864 /* Scaling.swift */; };
 		D91C3375232BD2F000B63864 /* ValueTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D91C3374232BD2F000B63864 /* ValueTransformer.swift */; };
+		D91F3A67232FD07900C974DD /* OSLog+convenience.swift in Sources */ = {isa = PBXBuildFile; fileRef = D91F3A66232FD07900C974DD /* OSLog+convenience.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,6 +40,7 @@
 		D91C336F2329475D00B63864 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D91C3372232BCF3D00B63864 /* Scaling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scaling.swift; sourceTree = "<group>"; };
 		D91C3374232BD2F000B63864 /* ValueTransformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValueTransformer.swift; sourceTree = "<group>"; };
+		D91F3A66232FD07900C974DD /* OSLog+convenience.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OSLog+convenience.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -104,6 +106,7 @@
 				D91C3374232BD2F000B63864 /* ValueTransformer.swift */,
 				D91C3372232BCF3D00B63864 /* Scaling.swift */,
 				D91C33592329391800B63864 /* UIImageView+thumbImageView.swift */,
+				D91F3A66232FD07900C974DD /* OSLog+convenience.swift */,
 				D91C336F2329475D00B63864 /* Assets.xcassets */,
 			);
 			path = Slider;
@@ -231,6 +234,7 @@
 				D91C3375232BD2F000B63864 /* ValueTransformer.swift in Sources */,
 				D91C335A2329391800B63864 /* Slider.swift in Sources */,
 				D91C3373232BCF3D00B63864 /* Scaling.swift in Sources */,
+				D91F3A67232FD07900C974DD /* OSLog+convenience.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
