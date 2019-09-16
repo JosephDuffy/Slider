@@ -93,9 +93,7 @@ internal struct ValueTransformer {
     private func sanitise(internalValue: Float) -> Float {
         var value = internalValue
 
-        if let step = step {
-            value = (Float(value)/step).rounded() * step
-        }
+        var roundingRule: FloatingPointRoundingRule = .toNearestOrAwayFromZero
 
         // Ensure that the value has not been moved out of the allowable range. The check above
         // ensures it will not be changes once at the extreme, but them ensures a single change doesn't
@@ -103,8 +101,14 @@ internal struct ValueTransformer {
         // then this would clamp it to 1.0
         if value > upperBound(for: .internal) {
             value = upperBound(for: .internal)
+            roundingRule = .down
         } else if value < lowerBound(for: .internal) {
             value = lowerBound(for: .internal)
+            roundingRule = .up
+        }
+
+        if let step = step {
+            value = (Float(value)/step).rounded(roundingRule) * step
         }
 
         return value
