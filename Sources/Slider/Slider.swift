@@ -3,37 +3,49 @@ import os.log
 
 open class Slider: UIControl {
 
-    /// The current value of the lower thumb. This value is pinned `lowerValueRange`.
-    open var lowerValue: Float = 0.25 {
+    private var internalLowerValue: ValueTransformer {
         didSet {
-            sanitise(value: &lowerValue, allowedRange: lowerValueRange)
             setNeedsLayout()
+        }
+    }
+
+    private var internalUpperValue: ValueTransformer {
+        didSet {
+            setNeedsLayout()
+        }
+    }
+
+    /// The current value of the lower thumb. This value is pinned `lowerValueRange`.
+    open var lowerValue: Float {
+        get {
+            return internalLowerValue.value(for: .external)
+        }
+        set {
+            internalLowerValue.set(value: newValue, from: .external)
         }
     }
 
     /// The current value of the upper thumb. This value is pinned `upperValueRange`.
-    open var upperValue: Float = 0.75 {
-        didSet {
-            sanitise(value: &upperValue, allowedRange: upperValueRange)
-            setNeedsLayout()
+    open var upperValue: Float {
+        get {
+            return internalUpperValue.value(for: .external)
+        }
+        set {
+            internalUpperValue.set(value: newValue, from: .external)
         }
     }
 
     /// The minimum value that the lower thumb can be set to.
-    open var minimumValue: Float = 0 {
-        didSet {
-            sanitise(value: &lowerValue, allowedRange: lowerValueRange)
-            setNeedsLayout()
-        }
+    open var minimumValue: Float {
+        return internalLowerValue.lowerBound(for: .external)
     }
 
     /// The maximum value that the upper thumb can be set to.
-    open var maximumValue: Float = 1 {
-        didSet {
-            sanitise(value: &upperValue, allowedRange: upperValueRange)
-            setNeedsLayout()
-        }
+    open var maximumValue: Float {
+        return internalUpperValue.upperBound(for: .external)
     }
+
+    public let scaling: Scaling
 
     open var step: Float?
 
@@ -41,14 +53,14 @@ open class Slider: UIControl {
     /// the range 0...100.
     open var lowerValueAsPercentage: Float {
         let range = maximumValue - minimumValue
-        return (lowerValue - minimumValue) / range
+        return ((lowerValue - minimumValue) / range) * 100
     }
 
     /// The current value of the lower thumb, represented as a percentage of the available range. This value will be in
     /// the range 0...100.
     open var upperValueAsPercentage: Float {
         let range = maximumValue - minimumValue
-        return (upperValue - minimumValue) / range
+        return ((upperValue - minimumValue) / range) * 100
     }
 
     /// The minimum width between the center of each of the thumbs.
@@ -56,28 +68,28 @@ open class Slider: UIControl {
         return Float(lowerThumbView.bounds.width)
     }
 
-    /// The minimum difference between the `lowerValue` and `upperValue`. This is restricted by the UI, so a wider
-    /// slider will have a smaller minimum value difference.
-    open var minimumValueDifference: Float {
-        return valueChangePerPoint * minimumThumbsDistance
-    }
-
     /// The allowed range of the lower value. This takes in to account the available visual space of the slider; the
     /// upper bound will be less than the `upperValue`.
     public var lowerValueRange: ClosedRange<Float> {
-        return minimumValue...(upperValue - minimumValueDifference)
+        return internalLowerValue.valueRange(for: .external)
     }
 
     /// The allowed range of the upper value. This takes in to account the available visual space of the slider; the
     /// lower bound will be greater than the `lowerValue`.
     public var upperValueRange: ClosedRange<Float> {
-        return (lowerValue + minimumValueDifference)...maximumValue
+        return internalUpperValue.valueRange(for: .external)
+    }
+
+    /// The minimum difference between the `lowerValue` and `upperValue`. This is restricted by the UI, so a wider
+    /// slider will have a smaller minimum value difference.
+    public var minimumValueDifferenceAsPecent: Float {
+        return Float(lowerThumbView.bounds.width / thumbTrackBoundingRect.width) * 100
     }
 
     /// The difference in value that a single point movement of the thumb represents. This will be the minimum change
     /// that can occur.
-    public var valueChangePerPoint: Float {
-        let range = maximumValue - minimumValue
+    private var valueChangePerPoint: Float {
+        let range = internalUpperValue.upperBound(for: .internal) - internalLowerValue.lowerBound(for: .internal)
         return range/Float(thumbTrackBoundingRect.width)
     }
 
@@ -126,14 +138,31 @@ open class Slider: UIControl {
     private(set) lazy var currentMinimumTrackImage: UIImage = Slider.defaultForegroundValueImage()
     private(set) lazy var currentMaximumTrackImage: UIImage = Slider.defaultBackgroundValueImage()
 
+    private func updateMinimumAndMaximumSliderValues() {
+        print(#function)
+        print("minimumValueDifferenceAsPecent", minimumValueDifferenceAsPecent)
+        print("upperValueAsPercentage", upperValueAsPercentage)
+        print("lowerValueAsPercentage", lowerValueAsPercentage)
+        internalLowerValue.maximumPercent = upperValueAsPercentage - minimumValueDifferenceAsPecent
+        internalUpperValue.minimumPercent = lowerValueAsPercentage + minimumValueDifferenceAsPecent
+    }
+
     public override init(frame: CGRect) {
+        scaling = .linear(0...100)
+        internalLowerValue = .init(internalValue: 25, scaling: scaling)
+        internalUpperValue = .init(internalValue: 75, scaling: scaling)
+
         super.init(frame: frame)
 
         addSubviews()
         copyStyle(of: UISlider())
     }
 
-    public required init(styledAfter slider: UISlider, frame: CGRect) {
+    public required init(styledAfter slider: UISlider, frame: CGRect, scaling: Scaling = .linear(0...100)) {
+        self.scaling = scaling
+        internalLowerValue = .init(internalValue: 25, scaling: scaling)
+        internalUpperValue = .init(internalValue: 75, scaling: scaling)
+
         super.init(frame: frame)
 
         addSubviews()
@@ -141,6 +170,10 @@ open class Slider: UIControl {
     }
 
     public required init?(coder aDecoder: NSCoder) {
+        scaling = .linear(0...100)
+        internalLowerValue = .init(internalValue: 25, scaling: scaling)
+        internalUpperValue = .init(internalValue: 75, scaling: scaling)
+
         super.init(coder: aDecoder)
 
         addSubviews()
@@ -153,6 +186,12 @@ open class Slider: UIControl {
         layoutForegroundSlider()
         layoutBackgroundTrackView()
         layoutThumbView()
+    }
+
+    open override var bounds: CGRect {
+        didSet {
+            updateMinimumAndMaximumSliderValues()
+        }
     }
 
     open func copyStyle(of slider: UISlider) {
@@ -185,11 +224,11 @@ open class Slider: UIControl {
         foregroundTrackView.frame = backgroundTrackRect
         let trackWidth = thumbTrackBoundingRect.width
 
-        let percentageDifference = upperValueAsPercentage - lowerValueAsPercentage
+        let percentageDifference = (upperValueAsPercentage - lowerValueAsPercentage) / 100
         let minimumTrackWidth = trackWidth * CGFloat(percentageDifference)
         foregroundTrackView.frame.size.width = minimumTrackWidth
 
-        let xOffset = trackWidth * CGFloat(lowerValueAsPercentage)
+        let xOffset = trackWidth * CGFloat(lowerValueAsPercentage / 100)
         let minX = thumbTrackBoundingRect.minX + xOffset
         foregroundTrackView.frame.origin.x = minX
 
@@ -218,7 +257,7 @@ open class Slider: UIControl {
 
     private func position(thumb: UIImageView, percent: CGFloat) {
         let trackWidth = thumbTrackBoundingRect.width
-        let xOffset = trackWidth * percent
+        let xOffset = trackWidth * (percent / 100)
         let midX = thumbTrackBoundingRect.minX + xOffset
         thumb.center = CGPoint(x: midX, y: thumbTrackBoundingRect.midY)
     }
@@ -243,39 +282,29 @@ open class Slider: UIControl {
 
         let upperGesture = UIPanGestureRecognizer(target: self, action: #selector(upperThumbViewGesture))
         upperThumbView.addGestureRecognizer(upperGesture)
+
+        updateMinimumAndMaximumSliderValues()
     }
 
     @objc private func lowerThumbViewGesture(_ recognizer: UIPanGestureRecognizer) {
-        handleGesture(recognizer: recognizer, value: \.lowerValue, allowedRange: lowerValueRange)
+        handleGesture(recognizer: recognizer, value: \.internalLowerValue, allowedRange: internalLowerValue.valueRange(for: .internal))
     }
 
     @objc private func upperThumbViewGesture(_ recognizer: UIPanGestureRecognizer) {
-        handleGesture(recognizer: recognizer, value: \.upperValue, allowedRange: upperValueRange)
+        handleGesture(recognizer: recognizer, value: \.internalUpperValue, allowedRange: internalUpperValue.valueRange(for: .internal))
     }
 
-    private func sanitise(value: inout Float, allowedRange: ClosedRange<Float>) {
-        if let step = step {
-            value = round(Float(value)/step) * step
-        }
-
-        // Ensure that the value has not been moved out of the allowable range. The check above
-        // ensures it will not be changes once at the extreme, but them ensures a single change doesn't
-        // move it past an extreme, e.g. current = 0.99, max = 1.0, change = 0.02 would set value to 1.01
-        // then this would clamp it to 1.0
-        if value > allowedRange.upperBound {
-            value = allowedRange.upperBound
-        } else if value < allowedRange.lowerBound {
-            value = allowedRange.lowerBound
-        }
-    }
-
-    private func handleGesture(recognizer: UIPanGestureRecognizer, value valueKeyPath: ReferenceWritableKeyPath<Slider, Float>, allowedRange: ClosedRange<Float>) {
+    private func handleGesture(
+        recognizer: UIPanGestureRecognizer,
+        value valueKeyPath: ReferenceWritableKeyPath<Slider, ValueTransformer>,
+        allowedRange: ClosedRange<Float>
+    ) {
         var value: Float {
             get {
-                return self[keyPath: valueKeyPath]
+                return self[keyPath: valueKeyPath].value(for: .internal)
             }
             set {
-                self[keyPath: valueKeyPath] = newValue
+                self[keyPath: valueKeyPath].set(value: newValue, from: .internal)
             }
         }
 
@@ -294,15 +323,24 @@ open class Slider: UIControl {
                 return
             }
 
-            value += Float(point.x) * valueChangePerPoint
+//            let changeAsPercentage = point.x / thumbTrackBoundingRect.width
+//            log("Slider was moved %{public}@, %{public}@%%", type: .debug, "\(point.x)", "\(changeAsPercentage)")
+//            log("Slider had value %{public}@ (internal); %{public}@ (external)", type: .debug, "\(self[keyPath: valueKeyPath].value(for: .internal))", "\(self[keyPath: valueKeyPath].value(for: .external))")
+////            self[keyPath: valueKeyPath] *= Float(changeAsPercentage)
+//            let multipedValue = self[keyPath: valueKeyPath] * Float(changeAsPercentage)
+//            self[keyPath: valueKeyPath] = multipedValue
+            let internalValueChange = Float(point.x) * valueChangePerPoint
+            log("internalValueChange %{public}@", type: .debug, "\(internalValueChange)")
+            value += internalValueChange
             log("Value updated to %{public}@", type: .debug, "\(value)")
             recognizer.setTranslation(.zero, in: self)
+            updateMinimumAndMaximumSliderValues()
 
             sendActions(for: .valueChanged)
 
             // The above checks ensure the min and max values will only be hit once so firing the haptics
             // will only occur once when reaching the end
-            if value == minimumValue || value == maximumValue {
+            if value == internalLowerValue.lowerBound(for: .internal) || value == internalUpperValue.upperBound(for: .internal) {
                 log("Triggering selection changed haptics", type: .debug)
                 UISelectionFeedbackGenerator().selectionChanged()
             }
