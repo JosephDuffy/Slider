@@ -137,6 +137,12 @@ open class Slider: UIControl {
         }
     }
 
+    open override var bounds: CGRect {
+        didSet {
+            updateMinimumAndMaximumSliderValues()
+        }
+    }
+
     public var log: OSLog?
 
     private let foregroundTrackView = UIImageView(image: nil)
@@ -147,15 +153,6 @@ open class Slider: UIControl {
     private(set) lazy var currentThumbImage: UIImage = Slider.defaultThumbImage()
     private(set) lazy var currentMinimumTrackImage: UIImage = Slider.defaultForegroundValueImage()
     private(set) lazy var currentMaximumTrackImage: UIImage = Slider.defaultBackgroundValueImage()
-
-    private func updateMinimumAndMaximumSliderValues() {
-        print(#function)
-        print("minimumValueDifferenceAsPecent", minimumValueDifferenceAsPecent)
-        print("upperValueAsPercentage", upperValueAsPercentage)
-        print("lowerValueAsPercentage", lowerValueAsPercentage)
-        internalLowerValue.maximumPercent = upperValueAsPercentage - minimumValueDifferenceAsPecent
-        internalUpperValue.minimumPercent = lowerValueAsPercentage + minimumValueDifferenceAsPecent
-    }
 
     public override init(frame: CGRect) {
         scaling = .linear(0...100)
@@ -198,12 +195,6 @@ open class Slider: UIControl {
         layoutThumbView()
     }
 
-    open override var bounds: CGRect {
-        didSet {
-            updateMinimumAndMaximumSliderValues()
-        }
-    }
-
     open func copyStyle(of slider: UISlider) {
         tintColor = slider.tintColor
     }
@@ -222,6 +213,11 @@ open class Slider: UIControl {
         rect.origin.y = bounds.midY.rounded(.down)
         rect.size.height = currentMinimumTrackImage.size.height
         return rect
+    }
+
+    private func updateMinimumAndMaximumSliderValues() {
+        internalLowerValue.maximumPercent = upperValueAsPercentage - minimumValueDifferenceAsPecent
+        internalUpperValue.minimumPercent = lowerValueAsPercentage + minimumValueDifferenceAsPecent
     }
 
     private func layoutBackgroundTrackView() {
