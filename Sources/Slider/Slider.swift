@@ -45,7 +45,12 @@ open class Slider: UIControl {
         return internalUpperValue.upperBound(for: .external)
     }
 
-    public let scaling: Scaling
+    public var scaling: Scaling {
+        didSet {
+            internalLowerValue.scaling = scaling
+            internalUpperValue.scaling = scaling
+        }
+    }
 
     open var step: Float? {
         didSet {

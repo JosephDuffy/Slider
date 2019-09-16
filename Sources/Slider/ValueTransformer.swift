@@ -7,7 +7,11 @@ internal struct ValueTransformer {
         case external
     }
 
-    internal let scaling: Scaling
+    internal var scaling: Scaling {
+        didSet {
+            sanitise()
+        }
+    }
 
     internal var step: Float? {
         didSet {
