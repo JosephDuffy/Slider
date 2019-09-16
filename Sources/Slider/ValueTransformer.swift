@@ -11,29 +11,25 @@ internal struct ValueTransformer {
 
     internal var step: Float? {
         didSet {
-            internalValue = sanitise(internalValue: internalValue)
+            sanitise()
         }
     }
 
     /// The minimum percent of the available range the value is capped to. In the range 0...100.
     internal var minimumPercent: Float = 0 {
         didSet {
-            internalValue = sanitise(internalValue: internalValue)
+            sanitise()
         }
     }
 
     /// The maximum percent of the available range the value is capped to. In the range 0...100.
     internal var maximumPercent: Float = 100 {
         didSet {
-            internalValue = sanitise(internalValue: internalValue)
+            sanitise()
         }
     }
 
-    private var internalValue: Float {
-        didSet {
-            internalValue = sanitise(internalValue: internalValue)
-        }
-    }
+    private var internalValue: Float
 
     internal init(internalValue: Float, step: Float? = nil, scaling: Scaling) {
         step.map { assert($0 > 0, "Step must be greater than 0") }
@@ -56,8 +52,10 @@ internal struct ValueTransformer {
         switch representation {
         case .internal:
             internalValue = value
+            sanitise()
         case .external:
             internalValue = transformExternalValue(value)
+            sanitise()
         }
     }
 
@@ -90,7 +88,7 @@ internal struct ValueTransformer {
         }
     }
 
-    private func sanitise(internalValue: Float) -> Float {
+    private mutating func sanitise() {
         var value = internalValue
 
         var roundingRule: FloatingPointRoundingRule = .toNearestOrAwayFromZero
@@ -111,7 +109,9 @@ internal struct ValueTransformer {
             value = (Float(value)/step).rounded(roundingRule) * step
         }
 
-        return value
+        guard internalValue != value else { return }
+
+        internalValue = value
     }
 
     private func transformInternalValue(_ internalValue: Float) -> Float {
