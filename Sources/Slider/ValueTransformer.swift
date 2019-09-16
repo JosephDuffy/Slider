@@ -22,6 +22,8 @@ internal struct ValueTransformer {
     /// The minimum percent of the available range the value is capped to. In the range 0...100.
     internal var minimumPercent: Float = 0 {
         didSet {
+            assert(minimumPercent >= 0, "Cannot set a negative minimum percent")
+            assert(minimumPercent <= maximumPercent, "Cannot set a minimum percent greater than maximum percent")
             sanitise()
         }
     }
@@ -29,11 +31,15 @@ internal struct ValueTransformer {
     /// The maximum percent of the available range the value is capped to. In the range 0...100.
     internal var maximumPercent: Float = 100 {
         didSet {
+            assert(maximumPercent <= 100, "Cannot set a maximum percent greater than 100")
+            assert(maximumPercent >= minimumPercent, "Cannot set a maximum percent less than minimum percent")
             sanitise()
         }
     }
 
     private var internalValue: Float
+
+    internal var log: OSLog?
 
     internal init(internalValue: Float, step: Float? = nil, scaling: Scaling) {
         step.map { assert($0 > 0, "Step must be greater than 0") }
@@ -111,6 +117,13 @@ internal struct ValueTransformer {
 
         if let step = step {
             value = (Float(value)/step).rounded(roundingRule) * step
+
+            if value > upperBound(for: .internal) {
+                log?.log("Value was great than upper bound after rounding %{public}@", type: .debug, "\(upperBound(for: .internal))")
+                value -= step
+            } else if value < lowerBound(for: .internal) {
+                value += step
+            }
         }
 
         guard internalValue != value else { return }
