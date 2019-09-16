@@ -9,7 +9,11 @@ internal struct ValueTransformer {
 
     internal let scaling: Scaling
 
-    internal let step: Float?
+    internal var step: Float? {
+        didSet {
+            internalValue = sanitise(internalValue: internalValue)
+        }
+    }
 
     /// The minimum percent of the available range the value is capped to. In the range 0...100.
     internal var minimumPercent: Float = 0 {

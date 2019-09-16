@@ -47,7 +47,12 @@ open class Slider: UIControl {
 
     public let scaling: Scaling
 
-    open var step: Float?
+    open var step: Float? {
+        didSet {
+            internalLowerValue.step = step
+            internalUpperValue.step = step
+        }
+    }
 
     /// The current value of the lower thumb, represented as a percentage of the available range. This value will be in
     /// the range 0...100.
