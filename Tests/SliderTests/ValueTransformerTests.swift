@@ -47,6 +47,16 @@ final class ValueTransformerTests: XCTestCase {
 
         valueTransformer.step = 1
         XCTAssertEqual(valueTransformer.value(for: .external), 40, accuracy: minimumAccuracy)
+
+        valueTransformer.step = 0.5
+        valueTransformer.maximumPercent = 50.3
+        valueTransformer.set(value: 50.31, from: .external)
+        XCTAssertEqual(valueTransformer.value(for: .external), 50, accuracy: minimumAccuracy)
+
+        valueTransformer.step = 0.5
+        valueTransformer.minimumPercent = 40.3
+        valueTransformer.set(value: 40.1, from: .external)
+        XCTAssertEqual(valueTransformer.value(for: .external), 40.5, accuracy: minimumAccuracy)
     }
 
 }
