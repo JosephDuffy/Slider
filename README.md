@@ -25,6 +25,7 @@ A rough roadmap that I would say moves us to a 1.0 would be:
 
  - [X] Fix slider tracks slicing
  - [ ] Increase tap area of thumbs
+ - [ ] Support dynamic ranges for values, so lower and upper values can be equal while being visually separated
  - [X] Tests for the scaling options
  - [X] Fix stepped scaling option
  - [X] Move to `github.com/Thread/Slider` or similar
@@ -42,6 +43,5 @@ In the future we may add:
  - [ ] API mirroring with `UISlider`. Other than `value` property this should be possible
    - Another option is to make `value` the result of `upperValue` - `lowerValue`
  - [ ] Support a single thumb
-  - This will also require the minimum track slicing to be correct
- - [ ] Support any number of thumbs
+   - This will also require the minimum track slicing to be correct
  - [ ] Accessibility support
