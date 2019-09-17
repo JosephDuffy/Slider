@@ -25,7 +25,8 @@ A rough roadmap that I would say moves us to a 1.0 would be:
 
  - [X] Fix slider tracks slicing
  - [ ] Increase tap area of thumbs
- - [ ] Tests for the scaling options
+ - [X] Tests for the scaling options
+ - [ ] Fix stepped scaling option
  - [ ] Move to `github.com/Thread/Slider` or similar
  - [ ] Create as Swift Package
   - With a lack of support for bundling assets this may not be possible, unless the images are created programmatically
