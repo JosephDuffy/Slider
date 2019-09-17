@@ -13,8 +13,13 @@ class ViewController: UIViewController {
 
         slider.log = OSLog(subsystem: "com.thread.SliderPlayground", category: "slider")
         slider.tintColor = .red
-        slider.scaling = .linear(0...100)
-        slider.step = 0.5
+        slider.scaling = .stepped([
+            0...50: 0...100,
+            50...75: 100...200,
+            75...90: 200...500,
+            90...100: 500...1000,
+        ])
+        slider.step = 5
         slider.addTarget(self, action: #selector(updateLabel), for: .valueChanged)
         updateLabel()
     }

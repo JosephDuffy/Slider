@@ -18,7 +18,7 @@ open class Slider: UIControl {
     /// The current value of the lower thumb. This value is pinned `lowerValueRange`.
     open var lowerValue: Float {
         get {
-            return internalLowerValue.value(for: .external)
+            return externalScope.lowerValue
         }
         set {
             internalLowerValue.set(value: newValue, from: .external)
@@ -28,7 +28,7 @@ open class Slider: UIControl {
     /// The current value of the upper thumb. This value is pinned `upperValueRange`.
     open var upperValue: Float {
         get {
-            return internalUpperValue.value(for: .external)
+            return externalScope.upperValue
         }
         set {
             internalUpperValue.set(value: newValue, from: .external)
@@ -37,12 +37,12 @@ open class Slider: UIControl {
 
     /// The minimum value that the lower thumb can be set to.
     open var minimumValue: Float {
-        return internalLowerValue.lowerBound(for: .external)
+        return externalScope.minimumValue
     }
 
     /// The maximum value that the upper thumb can be set to.
     open var maximumValue: Float {
-        return internalUpperValue.upperBound(for: .external)
+        return externalScope.maximumValue
     }
 
     public var scaling: Scaling {
@@ -59,18 +59,82 @@ open class Slider: UIControl {
         }
     }
 
-    /// The current value of the lower thumb, represented as a percentage of the available range. This value will be in
-    /// the range 0...100.
-    open var lowerValueAsPercentage: Float {
-        let range = maximumValue - minimumValue
-        return ((lowerValue - minimumValue) / range) * 100
+    private struct Lense {
+
+        private let scope: ValueTransformer.Representation
+
+        private let lowerTransformer: ValueTransformer
+
+        private let upperTransformer: ValueTransformer
+
+        fileprivate var lowerValue: Float {
+            return lowerTransformer.value(for: scope)
+        }
+
+        fileprivate var upperValue: Float {
+            return upperTransformer.value(for: scope)
+        }
+
+        fileprivate var minimumValue: Float {
+            return lowerTransformer.lowerBound(for: scope)
+        }
+
+        fileprivate var maximumValue: Float {
+            return upperTransformer.upperBound(for: scope)
+        }
+
+        fileprivate var lowerValueAsPercentage: Float {
+            let range = maximumValue - minimumValue
+            return ((lowerValue - minimumValue) / range) * 100
+        }
+
+        fileprivate var upperValueAsPercentage: Float {
+            let range = maximumValue - minimumValue
+            return ((upperValue - minimumValue) / range) * 100
+        }
+
+        public var lowerValueRange: ClosedRange<Float> {
+            return lowerTransformer.valueRange(for: scope)
+        }
+
+        public var upperValueRange: ClosedRange<Float> {
+            return upperTransformer.valueRange(for: scope)
+        }
+
+        public var range: ClosedRange<Float> {
+            return lowerValueRange.lowerBound...upperValueRange.upperBound
+        }
+
+        public var valueDistance: Float {
+            return maximumValue - minimumValue
+        }
+
+        fileprivate init(scope: ValueTransformer.Representation, lowerTransformer: ValueTransformer, upperTransformer: ValueTransformer) {
+            self.scope = scope
+            self.lowerTransformer = lowerTransformer
+            self.upperTransformer = upperTransformer
+        }
+
+    }
+
+    private var internalScope: Lense {
+        return Lense(scope: .internal, lowerTransformer: internalLowerValue, upperTransformer: internalUpperValue)
+    }
+
+    private var externalScope: Lense {
+        return Lense(scope: .external, lowerTransformer: internalLowerValue, upperTransformer: internalUpperValue)
     }
 
     /// The current value of the lower thumb, represented as a percentage of the available range. This value will be in
     /// the range 0...100.
-    open var upperValueAsPercentage: Float {
-        let range = maximumValue - minimumValue
-        return ((upperValue - minimumValue) / range) * 100
+    public var lowerValueAsPercentage: Float {
+        return internalScope.lowerValueAsPercentage
+    }
+
+    /// The current value of the lower thumb, represented as a percentage of the available range. This value will be in
+    /// the range 0...100.
+    public var upperValueAsPercentage: Float {
+        return internalScope.upperValueAsPercentage
     }
 
     /// The minimum width between the center of each of the thumbs.
@@ -81,13 +145,13 @@ open class Slider: UIControl {
     /// The allowed range of the lower value. This takes in to account the available visual space of the slider; the
     /// upper bound will be less than the `upperValue`.
     public var lowerValueRange: ClosedRange<Float> {
-        return internalLowerValue.valueRange(for: .external)
+        return externalScope.lowerValueRange
     }
 
     /// The allowed range of the upper value. This takes in to account the available visual space of the slider; the
     /// lower bound will be greater than the `lowerValue`.
     public var upperValueRange: ClosedRange<Float> {
-        return internalUpperValue.valueRange(for: .external)
+        return externalScope.upperValueRange
     }
 
     /// The minimum difference between the `lowerValue` and `upperValue`. This is restricted by the UI, so a wider
@@ -99,8 +163,7 @@ open class Slider: UIControl {
     /// The difference in value that a single point movement of the thumb represents. This will be the minimum change
     /// that can occur.
     private var valueChangePerPoint: Float {
-        let range = internalUpperValue.upperBound(for: .internal) - internalLowerValue.lowerBound(for: .internal)
-        return range/Float(thumbTrackBoundingRect.width)
+        return internalScope.valueDistance / Float(thumbTrackBoundingRect.width)
     }
 
     /// The tint colour of the foreground track.
@@ -161,8 +224,8 @@ open class Slider: UIControl {
 
     public override init(frame: CGRect) {
         scaling = .linear(0...100)
-        internalLowerValue = .init(internalValue: 25, scaling: scaling)
-        internalUpperValue = .init(internalValue: 75, scaling: scaling)
+        internalLowerValue = .init(externalValue: 25, scaling: scaling)
+        internalUpperValue = .init(externalValue: 75, scaling: scaling)
 
         super.init(frame: frame)
 
@@ -172,8 +235,8 @@ open class Slider: UIControl {
 
     public required init(styledAfter slider: UISlider, frame: CGRect, scaling: Scaling = .linear(0...100)) {
         self.scaling = scaling
-        internalLowerValue = .init(internalValue: 25, scaling: scaling)
-        internalUpperValue = .init(internalValue: 75, scaling: scaling)
+        internalLowerValue = .init(externalValue: 25, scaling: scaling)
+        internalUpperValue = .init(externalValue: 75, scaling: scaling)
 
         super.init(frame: frame)
 
@@ -183,8 +246,8 @@ open class Slider: UIControl {
 
     public required init?(coder aDecoder: NSCoder) {
         scaling = .linear(0...100)
-        internalLowerValue = .init(internalValue: 25, scaling: scaling)
-        internalUpperValue = .init(internalValue: 75, scaling: scaling)
+        internalLowerValue = .init(externalValue: 25, scaling: scaling)
+        internalUpperValue = .init(externalValue: 75, scaling: scaling)
 
         super.init(coder: aDecoder)
 

@@ -10,15 +10,20 @@ internal struct ValueTransformer {
 
     internal var scaling: Scaling {
         didSet {
-            sanitise()
+            log?.log("Scaling updated from %{public}@ to %{public}@", type: .debug, "\(oldValue)", "\(scaling)")
+
+            let previousValueAsPercent = internalValue / (oldValue.inputUpperBound - oldValue.inputLowerBound)
+
+            log?.log("Previous value was internalValue (%{public}@%%) in range %{public}@", type: .debug, "\(previousValueAsPercent * 100)", "\(oldValue.inputUpperBound - oldValue.inputLowerBound)")
+
+            let newInternalValue = (scaling.inputUpperBound - scaling.inputLowerBound) * previousValueAsPercent
+            internalValue = newInternalValue
+
+            log?.log("New value is %{public}@", type: .debug, "\(value(for: .external))")
         }
     }
 
-    internal var step: Float? {
-        didSet {
-            sanitise()
-        }
-    }
+    internal var step: Float?
 
     /// The minimum percent of the available range the value is capped to. In the range 0...100.
     internal var minimumPercent: Float = 0 {
@@ -26,7 +31,10 @@ internal struct ValueTransformer {
             assert(minimumPercent >= 0, "Cannot set a negative minimum percent")
             assert(minimumPercent <= maximumPercent, "Cannot set a minimum percent greater than maximum percent")
             log?.log("Minimum percent set to %{public}@%%", type: .debug, "\(minimumPercent)")
-            sanitise()
+
+            if internalValue < lowerBound(for: .internal) {
+                internalValue = lowerBound(for: .internal)
+            }
         }
     }
 
@@ -36,7 +44,10 @@ internal struct ValueTransformer {
             assert(maximumPercent <= 100, "Cannot set a maximum percent greater than 100")
             assert(maximumPercent >= minimumPercent, "Cannot set a maximum percent less than minimum percent")
             log?.log("Maximum percent set to %{public}@%%", type: .debug, "\(maximumPercent)")
-            sanitise()
+
+            if internalValue > upperBound(for: .internal) {
+                internalValue = upperBound(for: .internal)
+            }
         }
     }
 
@@ -44,12 +55,14 @@ internal struct ValueTransformer {
 
     internal var log: OSLog?
 
-    internal init(internalValue: Float, step: Float? = nil, scaling: Scaling) {
+    internal init(externalValue: Float, step: Float? = nil, scaling: Scaling) {
         step.map { assert($0 > 0, "Step must be greater than 0") }
 
-        self.internalValue = internalValue
+        self.internalValue = 0
         self.step = step
         self.scaling = scaling
+
+        self.internalValue = transformExternalValue(externalValue)
     }
 
     internal func value(for representation: Representation) -> Float {
@@ -57,18 +70,29 @@ internal struct ValueTransformer {
         case .internal:
             return internalValue
         case .external:
-            return transformInternalValue(internalValue)
+            let transformedValue = transformInternalValue(internalValue)
+            return sanitise(externalValue: transformedValue)
         }
     }
 
+    /**
+     Update the stored value. The set value will be pinned to within the upper and lower bounds.
+
+     - parameter value: The new value.
+     - parameter representation: The scope that this vlaue represents.
+     */
     internal mutating func set(value: Float, from representation: Representation) {
         switch representation {
         case .internal:
             internalValue = value
-            sanitise()
         case .external:
             internalValue = transformExternalValue(value)
-            sanitise()
+        }
+
+        if internalValue > upperBound(for: .internal) {
+            internalValue = upperBound(for: .internal)
+        } else if internalValue < lowerBound(for: .internal) {
+            internalValue = lowerBound(for: .internal)
         }
     }
 
@@ -87,7 +111,18 @@ internal struct ValueTransformer {
         case .internal:
             return internalLowerBound
         case .external:
-            return transformInternalValue(internalLowerBound)
+            let unboundOutputValue = transformInternalValue(internalLowerBound)
+
+            if let step = step {
+                let rounded = (Float(unboundOutputValue)/step).rounded(.up) * step
+                if transformExternalValue(rounded) < internalLowerBound {
+                    return rounded + step
+                } else {
+                    return rounded
+                }
+            } else {
+                return unboundOutputValue
+            }
         }
     }
 
@@ -97,62 +132,60 @@ internal struct ValueTransformer {
         case .internal:
             return internalUpperBound
         case .external:
-            return transformInternalValue(internalUpperBound)
+            let unboundOutputValue = transformInternalValue(internalUpperBound)
+
+            if let step = step {
+                let rounded = (Float(unboundOutputValue)/step).rounded() * step
+                if transformExternalValue(rounded) > internalUpperBound {
+                    return rounded - step
+                } else {
+                    return rounded
+                }
+            } else {
+                return unboundOutputValue
+            }
         }
     }
 
-    private mutating func sanitise() {
+    private func sanitise(externalValue: Float) -> Float {
         log?.log("Sanitising %{public}@", type: .debug, "\(internalValue)")
 
-        var value = internalValue
-
-        var roundingRule: FloatingPointRoundingRule = .toNearestOrAwayFromZero
-
-        // Ensure that the value has not been moved out of the allowable range. The check above
-        // ensures it will not be changes once at the extreme, but them ensures a single change doesn't
-        // move it past an extreme, e.g. current = 0.99, max = 1.0, change = 0.02 would set value to 1.01
-        // then this would clamp it to 1.0
-        if value > upperBound(for: .internal) {
-            log?.log("Value was great than upper bound %{public}@", type: .debug, "\(upperBound(for: .internal))")
-            value = upperBound(for: .internal)
-            roundingRule = .down
-        } else if value < lowerBound(for: .internal) {
-            log?.log("Value was less than lower bound %{public}@", type: .debug, "\(lowerBound(for: .internal))")
-            value = lowerBound(for: .internal)
-            roundingRule = .up
-        }
+        var value = externalValue
 
         if let step = step {
-            log?.log("Rounding to nearest %{public}@ using %{public}@", type: .debug, "\(step)", "\(roundingRule)")
-            value = (Float(value)/step).rounded(roundingRule) * step
-
-            if value > upperBound(for: .internal) {
-                log?.log("Value was great than upper bound after rounding %{public}@", type: .debug, "\(upperBound(for: .internal))")
-                value -= step
-            } else if value < lowerBound(for: .internal) {
-                log?.log("Value was less than lower bound after rounding %{public}@", type: .debug, "\(lowerBound(for: .internal))")
-                value += step
-            }
+            log?.log("Rounding to nearest %{public}@", type: .debug, "\(step)")
+            value = (Float(value)/step).rounded() * step
         }
 
-        guard internalValue != value else { return }
+        if value > upperBound(for: .external) {
+            log?.log("Value was great than upper bound %{public}@", type: .debug, "\(upperBound(for: .external))")
+            value = upperBound(for: .external)
+        } else if value < lowerBound(for: .external) {
+            log?.log("Value was less than lower bound %{public}@", type: .debug, "\(lowerBound(for: .external))")
+            value = lowerBound(for: .external)
+        }
 
-        log?.log("Sanitised value has changed from %{public}@ to %{public}@", type: .debug, "\(internalValue)", "\(value)")
+        log?.log("Sanitised value has changed from %{public}@ to %{public}@", type: .debug, "\(self.value(for: .external))", "\(value)")
 
-        internalValue = value
+        return value
     }
 
     private func transformInternalValue(_ internalValue: Float) -> Float {
+        let transformedValue: Float
+
         switch scaling {
         case .linear:
-            return internalValue
+            transformedValue = internalValue
         case let .stepped(boundries):
-            guard let (inputRange, outputRange) = boundries.first(where: { $0.key.contains(internalValue) }) else {
+            guard let (internalRange, externalRange) = boundries.first(where: { $0.key.contains(internalValue) }) else {
+                assertionFailure("Internal value should be within one of the boundries")
                 return internalValue
             }
 
-            return transformValue(internalValue, in: inputRange, to: outputRange)
+            transformedValue = transformValue(internalValue, in: internalRange, to: externalRange)
         }
+
+        return transformedValue
     }
 
     private func transformExternalValue(_ externalValue: Float) -> Float {
@@ -160,11 +193,12 @@ internal struct ValueTransformer {
         case .linear:
             return externalValue
         case let .stepped(boundries):
-            guard let (outputRange, inputRange) = boundries.first(where: { $0.value.contains(externalValue) }) else {
+            guard let (internalRange, externalRange) = boundries.first(where: { $0.value.contains(externalValue) }) else {
+                assertionFailure("External value should be within one of the boundries")
                 return externalValue
             }
 
-            return transformValue(externalValue, in: inputRange, to: outputRange)
+            return transformValue(externalValue, in: externalRange, to: internalRange)
         }
     }
 
