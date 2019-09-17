@@ -26,7 +26,7 @@ A rough roadmap that I would say moves us to a 1.0 would be:
  - [X] Fix slider tracks slicing
  - [ ] Increase tap area of thumbs
  - [X] Tests for the scaling options
- - [ ] Fix stepped scaling option
+ - [X] Fix stepped scaling option
  - [X] Move to `github.com/Thread/Slider` or similar
  - [ ] Create as Swift Package
   - With a lack of support for bundling assets this may not be possible, unless the images are created programmatically
@@ -34,7 +34,7 @@ A rough roadmap that I would say moves us to a 1.0 would be:
 
 In the future we may add:
 
- - [ ] `OSLog` support
+ - [X] `OSLog` support
  - [ ] Snapshot tests to compare to the system `UISlider` on various device screen scales
  - [ ] Fix width being different to `UISlider`
  - [ ] Support different images per-state
