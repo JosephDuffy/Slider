@@ -165,7 +165,7 @@ internal struct ValueTransformer {
             value = lowerBound(for: .external)
         }
 
-        log?.log("Sanitised value has changed from %{public}@ to %{public}@", type: .debug, "\(self.value(for: .external))", "\(value)")
+        log?.log("Sanitised %{public}@ to %{public}@", type: .debug, "\(externalValue)", "\(value)")
 
         return value
     }
