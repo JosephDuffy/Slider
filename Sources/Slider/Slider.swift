@@ -229,6 +229,7 @@ open class Slider: UIControl {
 
         super.init(frame: frame)
 
+        backgroundColor = nil
         addSubviews()
         copyStyle(of: UISlider())
     }
@@ -240,6 +241,7 @@ open class Slider: UIControl {
 
         super.init(frame: frame)
 
+        backgroundColor = nil
         addSubviews()
         copyStyle(of: slider)
     }
@@ -251,6 +253,7 @@ open class Slider: UIControl {
 
         super.init(coder: aDecoder)
 
+        backgroundColor = nil
         addSubviews()
         copyStyle(of: UISlider())
     }
