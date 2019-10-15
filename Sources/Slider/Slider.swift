@@ -154,16 +154,16 @@ open class Slider: UIControl {
         return externalScope.upperValueRange
     }
 
-    /// The minimum difference between the `lowerValue` and `upperValue`. This is restricted by the UI, so a wider
-    /// slider will have a smaller minimum value difference.
-    public var minimumValueDifferenceAsPecent: Float {
-        return Float(lowerThumbView.bounds.width / thumbTrackBoundingRect.width) * 100
+    /// The difference in value that a single point movement of the lower thumb represents. This will be the minimum
+    /// change that can occur.
+    private var lowerThumbValueChangePerPoint: Float {
+        return internalScope.valueDistance / Float(lowerThumbBoundingRect.width)
     }
 
-    /// The difference in value that a single point movement of the thumb represents. This will be the minimum change
-    /// that can occur.
-    private var valueChangePerPoint: Float {
-        return internalScope.valueDistance / Float(thumbTrackBoundingRect.width)
+    /// The difference in value that a single point movement of the upper thumb represents. This will be the minimum
+    /// change that can occur.
+    private var upperThumbValueChangePerPoint: Float {
+        return internalScope.valueDistance / Float(upperThumbBoundingRect.width)
     }
 
     /// The tint colour of the foreground track.
@@ -284,8 +284,8 @@ open class Slider: UIControl {
     }
 
     private func updateMinimumAndMaximumSliderValues() {
-        internalLowerValue.maximumPercent = upperValueAsPercentage - minimumValueDifferenceAsPecent
-        internalUpperValue.minimumPercent = lowerValueAsPercentage + minimumValueDifferenceAsPecent
+        internalLowerValue.maximumPercent = upperValueAsPercentage
+        internalUpperValue.minimumPercent = lowerValueAsPercentage
     }
 
     private func layoutBackgroundTrackView() {
@@ -296,16 +296,8 @@ open class Slider: UIControl {
     private func layoutForegroundSlider() {
         let backgroundTrackRect = trackRect(forBounds: bounds)
         foregroundTrackView.frame = backgroundTrackRect
-        let trackWidth = thumbTrackBoundingRect.width
-
-        let percentageDifference = (upperValueAsPercentage - lowerValueAsPercentage) / 100
-        let minimumTrackWidth = trackWidth * CGFloat(percentageDifference)
-        foregroundTrackView.frame.size.width = minimumTrackWidth
-
-        let xOffset = trackWidth * CGFloat(lowerValueAsPercentage / 100)
-        let minX = thumbTrackBoundingRect.minX + xOffset
-        foregroundTrackView.frame.origin.x = minX
-
+        foregroundTrackView.frame.origin.x = lowerThumbView.center.x
+        foregroundTrackView.frame.size.width = upperThumbView.center.x - lowerThumbView.center.x
     }
 
     private var thumbTrackBoundingRect: CGRect {
@@ -317,6 +309,18 @@ open class Slider: UIControl {
         return bounds.insetBy(dx: widthDifference, dy: 0)
     }
 
+    private var lowerThumbBoundingRect: CGRect {
+        return thumbTrackBoundingRect.inset(
+            by: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: upperThumbView.bounds.width)
+        )
+    }
+
+    private var upperThumbBoundingRect: CGRect {
+        return thumbTrackBoundingRect.inset(
+            by: UIEdgeInsets(top: 0, left: lowerThumbView.bounds.width, bottom: 0, right: 0)
+        )
+    }
+
     private var thumbImageSize: CGSize {
         return CGSize(width: 31, height: 31)
     }
@@ -325,15 +329,23 @@ open class Slider: UIControl {
         lowerThumbView.frame.size = thumbImageSize
         upperThumbView.frame.size = thumbImageSize
 
-        position(thumb: lowerThumbView, percent: CGFloat(lowerValueAsPercentage))
-        position(thumb: upperThumbView, percent: CGFloat(upperValueAsPercentage))
+        position(
+            thumb: lowerThumbView,
+            percent: CGFloat(lowerValueAsPercentage),
+            in: lowerThumbBoundingRect
+        )
+        position(
+            thumb: upperThumbView,
+            percent: CGFloat(upperValueAsPercentage),
+            in: upperThumbBoundingRect
+        )
     }
 
-    private func position(thumb: UIImageView, percent: CGFloat) {
-        let trackWidth = thumbTrackBoundingRect.width
+    private func position(thumb: UIImageView, percent: CGFloat, in rect: CGRect) {
+        let trackWidth = rect.width
         let xOffset = trackWidth * (percent / 100)
-        let midX = thumbTrackBoundingRect.minX + xOffset
-        thumb.center = CGPoint(x: midX, y: thumbTrackBoundingRect.midY)
+        let midX = rect.minX + xOffset
+        thumb.center = CGPoint(x: midX, y: rect.midY)
     }
 
     private func addSubviews() {
@@ -361,17 +373,28 @@ open class Slider: UIControl {
     }
 
     @objc private func lowerThumbViewGesture(_ recognizer: UIPanGestureRecognizer) {
-        handleGesture(recognizer: recognizer, value: \.internalLowerValue, allowedRange: internalLowerValue.valueRange(for: .internal))
+        handleGesture(
+            recognizer: recognizer,
+            value: \.internalLowerValue,
+            allowedRange: internalLowerValue.valueRange(for: .internal),
+            valueChangePerPoint: lowerThumbValueChangePerPoint
+        )
     }
 
     @objc private func upperThumbViewGesture(_ recognizer: UIPanGestureRecognizer) {
-        handleGesture(recognizer: recognizer, value: \.internalUpperValue, allowedRange: internalUpperValue.valueRange(for: .internal))
+        handleGesture(
+            recognizer: recognizer,
+            value: \.internalUpperValue,
+            allowedRange: internalUpperValue.valueRange(for: .internal),
+            valueChangePerPoint: upperThumbValueChangePerPoint
+        )
     }
 
     private func handleGesture(
         recognizer: UIPanGestureRecognizer,
         value valueKeyPath: ReferenceWritableKeyPath<Slider, ValueTransformer>,
-        allowedRange: ClosedRange<Float>
+        allowedRange: ClosedRange<Float>,
+        valueChangePerPoint: Float
     ) {
         var value: Float {
             get {
