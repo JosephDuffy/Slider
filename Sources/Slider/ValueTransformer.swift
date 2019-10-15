@@ -148,7 +148,7 @@ internal struct ValueTransformer {
     }
 
     private func sanitise(externalValue: Float) -> Float {
-        log?.log("Sanitising %{public}@", type: .debug, "\(internalValue)")
+        log?.log("Sanitising %{public}@", type: .debug, "\(externalValue)")
 
         var value = externalValue
 
