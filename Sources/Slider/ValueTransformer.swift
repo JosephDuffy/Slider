@@ -65,6 +65,14 @@ internal struct ValueTransformer {
         self.internalValue = transformExternalValue(externalValue)
     }
 
+    internal init(internalValue: Float, step: Float? = nil, scaling: Scaling) {
+        step.map { assert($0 > 0, "Step must be greater than 0") }
+
+        self.internalValue = internalValue
+        self.step = step
+        self.scaling = scaling
+    }
+
     internal func value(for representation: Representation) -> Float {
         switch representation {
         case .internal:

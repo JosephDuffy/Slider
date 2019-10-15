@@ -457,7 +457,24 @@ open class Slider: UIControl {
             )
         log?.log("Proposed internal value: %{public}@", type: .debug, "\(proposedInternalValue)")
 
-        value = proposedInternalValue
+        if let step = self.step {
+            var proposedValueTransformer = ValueTransformer(internalValue: proposedInternalValue, step: nil, scaling: self[keyPath: valueKeyPath].scaling)
+            let proposedExternalValue = proposedValueTransformer.value(for: .external)
+            log?.log("Proposed external value: %{public}@", type: .debug, "\(proposedExternalValue)")
+
+            let proposedExternalChange = value - proposedExternalValue
+
+            guard abs(proposedExternalChange) >= abs(step) else {
+                log?.log("Proposed value change of %{public}@ was less than step %{public}@", type: .debug, "\(abs(proposedExternalChange))", "\(abs(step))")
+                return false
+            }
+
+            proposedValueTransformer.step = self[keyPath: valueKeyPath].step
+            self[keyPath: valueKeyPath].set(value: proposedValueTransformer.value(for: .external), from: .external)
+        } else {
+            value = proposedInternalValue
+        }
+
         log?.log("Value updated to %{public}@", type: .debug, "\(value)")
 
         sendActions(for: .valueChanged)
