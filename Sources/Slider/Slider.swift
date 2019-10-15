@@ -363,39 +363,74 @@ open class Slider: UIControl {
         lowerThumbView.isUserInteractionEnabled = true
         upperThumbView.isUserInteractionEnabled = true
 
-        let lowerGesture = UIPanGestureRecognizer(target: self, action: #selector(lowerThumbViewGesture))
-        lowerThumbView.addGestureRecognizer(lowerGesture)
-
-        let upperGesture = UIPanGestureRecognizer(target: self, action: #selector(upperThumbViewGesture))
-        upperThumbView.addGestureRecognizer(upperGesture)
-
         updateMinimumAndMaximumSliderValues()
     }
 
-    @objc private func lowerThumbViewGesture(_ recognizer: UIPanGestureRecognizer) {
-        handleGesture(
-            recognizer: recognizer,
-            value: \.internalLowerValue,
-            allowedRange: internalLowerValue.valueRange(for: .internal),
-            valueChangePerPoint: lowerThumbValueChangePerPoint
-        )
+    private var trackedTouchesInitialLocations: [UITouch: CGPoint] = [:]
+
+    open override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        touches.forEach { touch in
+            trackedTouchesInitialLocations[touch] = touch.location(in: self)
+        }
     }
 
-    @objc private func upperThumbViewGesture(_ recognizer: UIPanGestureRecognizer) {
-        handleGesture(
-            recognizer: recognizer,
-            value: \.internalUpperValue,
-            allowedRange: internalUpperValue.valueRange(for: .internal),
-            valueChangePerPoint: upperThumbValueChangePerPoint
-        )
+    open override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        for touch in touches {
+            guard let initialLocation = trackedTouchesInitialLocations[touch] else {
+                assertionFailure("There should always be an initial location for a touch that has moved")
+                break
+            }
+
+            let currentLocation = touch.location(in: self)
+            let movement = currentLocation.x - initialLocation.x
+
+            let valueDidUpdate: Bool
+
+            switch touch.view {
+            case lowerThumbView:
+                valueDidUpdate = update(
+                    value: \.internalLowerValue,
+                    valueChangePerPoint: lowerThumbValueChangePerPoint,
+                    pointsMoved: movement
+                )
+            case upperThumbView:
+                valueDidUpdate = update(
+                    value: \.internalUpperValue,
+                    valueChangePerPoint: upperThumbValueChangePerPoint,
+                    pointsMoved: movement
+                )
+            default:
+                continue
+            }
+
+            if valueDidUpdate {
+                trackedTouchesInitialLocations[touch] = currentLocation
+                updateMinimumAndMaximumSliderValues()
+                setNeedsLayout()
+                layoutIfNeeded()
+            }
+        }
     }
 
-    private func handleGesture(
-        recognizer: UIPanGestureRecognizer,
+    open override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        touches.forEach { trackedTouchesInitialLocations.removeValue(forKey: $0) }
+    }
+
+    open override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        // TODO: Revert to initial location?
+        touches.forEach { trackedTouchesInitialLocations.removeValue(forKey: $0) }
+    }
+
+    private func update(
         value valueKeyPath: ReferenceWritableKeyPath<Slider, ValueTransformer>,
-        allowedRange: ClosedRange<Float>,
-        valueChangePerPoint: Float
-    ) {
+        valueChangePerPoint: Float,
+        pointsMoved: CGFloat
+    ) -> Bool {
+        // Nothing needs to be done if the movement was not big enough to register as a translation
+        guard pointsMoved != 0 else { return false }
+
+        let allowedRange = self[keyPath: valueKeyPath].valueRange(for: .internal)
+
         var value: Float {
             get {
                 return self[keyPath: valueKeyPath].value(for: .internal)
@@ -405,44 +440,36 @@ open class Slider: UIControl {
             }
         }
 
-        switch recognizer.state {
-        case .changed, .ended:
-            let point = recognizer.translation(in: self)
-
-            // Nothing needs to be done if the movement was not big enough to register as a translation
-            guard point.x != 0 else { return }
-
-            // Nothing needs to be done if the thumb is already at its min or max position and the change
-            // would move it past this point
-            if value == allowedRange.upperBound && point.x > 0 {
-                return
-            } else if value == allowedRange.lowerBound && point.x < 0 {
-                return
-            }
-
-            let internalValueChange = Float(point.x) * valueChangePerPoint
-            log?.log("internalValueChange %{public}@", type: .debug, "\(internalValueChange)")
-            value += internalValueChange
-            log?.log("Value updated to %{public}@", type: .debug, "\(value)")
-            recognizer.setTranslation(.zero, in: self)
-            updateMinimumAndMaximumSliderValues()
-
-            sendActions(for: .valueChanged)
-
-            // The above checks ensure the min and max values will only be hit once so firing the haptics
-            // will only occur once when reaching the end
-            if value == internalLowerValue.lowerBound(for: .internal) || value == internalUpperValue.upperBound(for: .internal) {
-                log?.log("Triggering selection changed haptics", type: .debug)
-                UISelectionFeedbackGenerator().selectionChanged()
-            }
-        case .cancelled:
-            // TODO: Reset to start
-            break
-        case .began, .possible, .failed:
-            break
-        @unknown default:
-            break
+        // Nothing needs to be done if the thumb is already at its min or max position and the change
+        // would move it past this point
+        if value == allowedRange.upperBound && pointsMoved > 0 {
+            return false
+        } else if value == allowedRange.lowerBound && pointsMoved < 0 {
+            return false
         }
+
+        let internalValueChange = Float(pointsMoved) * valueChangePerPoint
+        log?.log("internalValueChange %{public}@", type: .debug, "\(internalValueChange)")
+        let proposedInternalValue =
+            min(
+                max(value + internalValueChange, allowedRange.lowerBound),
+                allowedRange.upperBound
+            )
+        log?.log("Proposed internal value: %{public}@", type: .debug, "\(proposedInternalValue)")
+
+        value = proposedInternalValue
+        log?.log("Value updated to %{public}@", type: .debug, "\(value)")
+
+        sendActions(for: .valueChanged)
+
+        // The above checks ensure the min and max values will only be hit once so firing the haptics
+        // will only occur once when reaching the end
+        if value == internalLowerValue.lowerBound(for: .internal) || value == internalUpperValue.upperBound(for: .internal) {
+            log?.log("Triggering selection changed haptics", type: .debug)
+            UISelectionFeedbackGenerator().selectionChanged()
+        }
+
+        return true
     }
 
     private var thumbImages: [UIControl.State.RawValue: UIImage] = [:]

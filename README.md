@@ -26,7 +26,7 @@ A rough roadmap that I would say moves us to a 1.0 would be:
  - [X] Fix slider tracks slicing
  - [ ] Snap to step value
  - [X] Support dynamic ranges for values, so lower and upper values can be equal while being visually separated
- - [ ] Track sliding of thumbs via `touches*` functions
+ - [X] Track sliding of thumbs via `touches*` functions
   - This would allow the movement to be immediate, rather than the slight delay introduced by using gesture recognizers
  - [ ] Increase tap area of thumbs
  - [X] Tests for the scaling options
