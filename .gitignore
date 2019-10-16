@@ -12,6 +12,7 @@ xcuserdata/
 
 # Documentation
 docs/
+build/
 
 # Carthage
 Carthage

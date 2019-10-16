@@ -1,0 +1,4 @@
+author: "Joseph Duffy"
+github_url: https://github.com/Thread/Slider
+undocumented_text: ""
+xcodebuild_arguments: [-project,Slider.xcodeproj]
