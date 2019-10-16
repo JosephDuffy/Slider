@@ -19,4 +19,4 @@ jobs:
     - name: Select Xcode ${{ matrix.xcode }}
       run: sudo xcode-select --switch /Applications/Xcode_${{ matrix.xcode }}.app
     - name: Test ${{ matrix.platform }}
-      run: bundle exec fastlane scan --clean --scheme "Slider"
+      run: bundle exec fastlane scan --clean --project "Slider.xcodeproj" --scheme "Slider"
