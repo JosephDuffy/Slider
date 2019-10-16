@@ -20,3 +20,19 @@ jobs:
         files: Slider.framework.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  docs_upload:
+    name: Documentation
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: bundle install
+      run: bundle install --deployment
+    - name: Build docs
+      run: bundle exec jazzy
+    - uses: JamesIves/github-pages-deploy-action@master
+      env:
+        ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRANCH: gh-pages
+        FOLDER: docs
