@@ -1,0 +1,22 @@
+name: Release
+
+on:
+  push:
+    branch: master
+    tags: '*'
+
+jobs:
+  github_release:
+    name: GitHub
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build carthage archive
+      run: carthage build --archive --platform iOS
+    - name: Deploy
+      uses: softprops/action-gh-release@v1
+      with:
+        files: Slider.framework.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
