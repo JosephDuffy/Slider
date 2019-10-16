@@ -1,0 +1,22 @@
+name: Tests
+
+on: [push]
+
+jobs:
+  xcode_tests:
+    name: ${{ matrix.platform }} on Xcode ${{ matrix.xcode }}
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        xcode: [10.3, 11]
+        platform: ["iOS"]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: bundle install
+      run: bundle install --deployment
+    - name: Select Xcode ${{ matrix.xcode }}
+      run: sudo xcode-select --switch /Applications/Xcode_${{ matrix.xcode }}.app
+    - name: Test ${{ matrix.platform }}
+      run: bundle exec fastlane scan --clean --project "Slider.xcodeproj" --scheme "Slider"
