@@ -373,6 +373,11 @@ open class Slider: UIControl {
 
     open override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         touches.forEach { touch in
+            // TODO: Store initial value to be used in calculation. This will enable tracking the exact valeu change so
+            // the thumb is always under the user's finger. This would require a function along the lines of `update`
+            // that instead calculates the difference between the initial position and the current position, taking in
+            // to account the step etc. This value can then be checked against the current value and – if different –
+            // updated, triggering haptics etc.
             trackedTouchesInitialLocations[touch] = touch.location(in: self)
         }
     }
