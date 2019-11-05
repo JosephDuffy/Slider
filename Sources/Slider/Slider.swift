@@ -454,7 +454,8 @@ open class Slider: UIControl {
                 let proposedExternalChange = valueTransformer.value(for: .external) - proposedExternalValue
                 log?.log("Proposed external value change: %{public}@", type: .debug, "\(proposedExternalChange)")
 
-                guard abs(proposedExternalChange) >= abs(step) else {
+                // Using `nextUp` and `nextDown` allows rounding errors to be ignored
+                guard abs(proposedExternalChange).nextUp >= abs(step).nextDown  else {
                     log?.log("Proposed value change of %{public}@ was less than step %{public}@", type: .debug, "\(abs(proposedExternalChange))", "\(abs(step))")
                     continue
                 }
