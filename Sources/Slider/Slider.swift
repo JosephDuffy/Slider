@@ -497,6 +497,8 @@ open class Slider: UIControl {
             default:
                 return
             }
+
+            sendActions(for: .valueChanged)
         }
     }
 
