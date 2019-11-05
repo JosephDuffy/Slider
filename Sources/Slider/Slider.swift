@@ -369,54 +369,116 @@ open class Slider: UIControl {
         updateMinimumAndMaximumSliderValues()
     }
 
-    private var trackedTouchesInitialLocations: [UITouch: CGPoint] = [:]
+    private var trackedTouchesInitialLocations: [UITouch: TrackingThumb] = [:]
+
+    private struct TrackingThumb {
+        let startingValue: ValueTransformer
+        let startingLocation: CGPoint
+    }
 
     open override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         touches.forEach { touch in
-            // TODO: Store initial value to be used in calculation. This will enable tracking the exact valeu change so
-            // the thumb is always under the user's finger. This would require a function along the lines of `update`
-            // that instead calculates the difference between the initial position and the current position, taking in
-            // to account the step etc. This value can then be checked against the current value and – if different –
-            // updated, triggering haptics etc.
-            trackedTouchesInitialLocations[touch] = touch.location(in: self)
+            let startingValue: ValueTransformer
+            switch touch.view {
+            case lowerThumbView:
+                startingValue = internalLowerValue
+            case upperThumbView:
+                startingValue = internalUpperValue
+            default:
+                return
+            }
+            let startingLocation = touch.location(in: self)
+            let trackingThumb = TrackingThumb(startingValue: startingValue, startingLocation: startingLocation)
+            trackedTouchesInitialLocations[touch] = trackingThumb
         }
     }
 
     open override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         for touch in touches {
-            guard let initialLocation = trackedTouchesInitialLocations[touch] else {
-                assertionFailure("There should always be an initial location for a touch that has moved")
+            guard let trackingThumb = trackedTouchesInitialLocations[touch] else {
+                assertionFailure("There should always be a tracking thumb for a touch that has moved")
                 break
             }
 
             let currentLocation = touch.location(in: self)
-            let movement = currentLocation.x - initialLocation.x
-
-            let valueDidUpdate: Bool
+            let pointsMoved = currentLocation.x - trackingThumb.startingLocation.x
+            let valueChangePerPoint: Float
+            var valueTransformer: ValueTransformer {
+                get {
+                    switch touch.view {
+                    case lowerThumbView:
+                        return internalLowerValue
+                    case upperThumbView:
+                        return internalUpperValue
+                    default:
+                        fatalError()
+                    }
+                }
+                set {
+                    switch touch.view {
+                    case lowerThumbView:
+                        internalLowerValue = newValue
+                    case upperThumbView:
+                        internalUpperValue = newValue
+                    default:
+                        fatalError()
+                    }
+                }
+            }
 
             switch touch.view {
             case lowerThumbView:
-                valueDidUpdate = update(
-                    value: \.internalLowerValue,
-                    valueChangePerPoint: lowerThumbValueChangePerPoint,
-                    pointsMoved: movement
-                )
+                valueChangePerPoint = lowerThumbValueChangePerPoint
             case upperThumbView:
-                valueDidUpdate = update(
-                    value: \.internalUpperValue,
-                    valueChangePerPoint: upperThumbValueChangePerPoint,
-                    pointsMoved: movement
-                )
+                valueChangePerPoint = upperThumbValueChangePerPoint
             default:
                 continue
             }
 
-            if valueDidUpdate {
-                trackedTouchesInitialLocations[touch] = currentLocation
-                updateMinimumAndMaximumSliderValues()
-                setNeedsLayout()
-                layoutIfNeeded()
+            let valueChange = Float(pointsMoved) * valueChangePerPoint
+
+            guard valueChange != 0 else { continue }
+
+            var proposedValue = trackingThumb.startingValue.value(for: .internal) + valueChange
+
+            if proposedValue > trackingThumb.startingValue.upperBound(for: .internal) {
+                proposedValue = trackingThumb.startingValue.upperBound(for: .internal)
+            } else if proposedValue < trackingThumb.startingValue.lowerBound(for: .internal) {
+                proposedValue = trackingThumb.startingValue.lowerBound(for: .internal)
             }
+
+            if let step = self.step {
+                var proposedValueTransformer = valueTransformer
+                proposedValueTransformer.set(value: proposedValue, from: .internal)
+                let proposedExternalValue = proposedValueTransformer.value(for: .external)
+                log?.log("Proposed external value: %{public}@", type: .debug, "\(proposedExternalValue)")
+
+                let proposedExternalChange = valueTransformer.value(for: .external) - proposedExternalValue
+                log?.log("Proposed external value change: %{public}@", type: .debug, "\(proposedExternalChange)")
+
+                guard abs(proposedExternalChange) >= abs(step) else {
+                    log?.log("Proposed value change of %{public}@ was less than step %{public}@", type: .debug, "\(abs(proposedExternalChange))", "\(abs(step))")
+                    continue
+                }
+
+                proposedValueTransformer.set(value: proposedExternalValue, from: .external)
+                proposedValue = proposedValueTransformer.value(for: .internal)
+            }
+
+            guard valueTransformer.value(for: .internal) != proposedValue else { continue }
+
+            valueTransformer.set(value: proposedValue, from: .internal)
+
+            sendActions(for: .valueChanged)
+
+            if proposedValue == internalLowerValue.lowerBound(for: .internal) || proposedValue == internalUpperValue.upperBound(for: .internal) {
+                log?.log("Triggering selection changed haptics", type: .debug)
+                UISelectionFeedbackGenerator().selectionChanged()
+            }
+
+            updateMinimumAndMaximumSliderValues()
+            setNeedsLayout()
+            layoutIfNeeded()
         }
     }
 
@@ -425,76 +487,17 @@ open class Slider: UIControl {
     }
 
     open override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        // TODO: Revert to initial location?
-        touches.forEach { trackedTouchesInitialLocations.removeValue(forKey: $0) }
-    }
-
-    private func update(
-        value valueKeyPath: ReferenceWritableKeyPath<Slider, ValueTransformer>,
-        valueChangePerPoint: Float,
-        pointsMoved: CGFloat
-    ) -> Bool {
-        // Nothing needs to be done if the movement was not big enough to register as a translation
-        guard pointsMoved != 0 else { return false }
-
-        let allowedRange = self[keyPath: valueKeyPath].valueRange(for: .internal)
-
-        var value: Float {
-            get {
-                return self[keyPath: valueKeyPath].value(for: .internal)
-            }
-            set {
-                self[keyPath: valueKeyPath].set(value: newValue, from: .internal)
+        touches.forEach { touch in
+            guard let trackingThumb = trackedTouchesInitialLocations.removeValue(forKey: touch) else { return }
+            switch touch.view {
+            case lowerThumbView:
+                internalLowerValue = trackingThumb.startingValue
+            case upperThumbView:
+                internalUpperValue = trackingThumb.startingValue
+            default:
+                return
             }
         }
-
-        // Nothing needs to be done if the thumb is already at its min or max position and the change
-        // would move it past this point
-        if value == allowedRange.upperBound && pointsMoved > 0 {
-            return false
-        } else if value == allowedRange.lowerBound && pointsMoved < 0 {
-            return false
-        }
-
-        let internalValueChange = Float(pointsMoved) * valueChangePerPoint
-        log?.log("internalValueChange %{public}@", type: .debug, "\(internalValueChange)")
-        let proposedInternalValue =
-            min(
-                max(value + internalValueChange, allowedRange.lowerBound),
-                allowedRange.upperBound
-            )
-        log?.log("Proposed internal value: %{public}@", type: .debug, "\(proposedInternalValue)")
-
-        if let step = self.step {
-            var proposedValueTransformer = ValueTransformer(internalValue: proposedInternalValue, step: nil, scaling: self[keyPath: valueKeyPath].scaling)
-            let proposedExternalValue = proposedValueTransformer.value(for: .external)
-            log?.log("Proposed external value: %{public}@", type: .debug, "\(proposedExternalValue)")
-
-            let proposedExternalChange = value - proposedExternalValue
-
-            guard abs(proposedExternalChange) >= abs(step) else {
-                log?.log("Proposed value change of %{public}@ was less than step %{public}@", type: .debug, "\(abs(proposedExternalChange))", "\(abs(step))")
-                return false
-            }
-
-            proposedValueTransformer.step = self[keyPath: valueKeyPath].step
-            self[keyPath: valueKeyPath].set(value: proposedValueTransformer.value(for: .external), from: .external)
-        } else {
-            value = proposedInternalValue
-        }
-
-        log?.log("Value updated to %{public}@", type: .debug, "\(value)")
-
-        sendActions(for: .valueChanged)
-
-        // The above checks ensure the min and max values will only be hit once so firing the haptics
-        // will only occur once when reaching the end
-        if value == internalLowerValue.lowerBound(for: .internal) || value == internalUpperValue.upperBound(for: .internal) {
-            log?.log("Triggering selection changed haptics", type: .debug)
-            UISelectionFeedbackGenerator().selectionChanged()
-        }
-
-        return true
     }
 
     private var thumbImages: [UIControl.State.RawValue: UIImage] = [:]
