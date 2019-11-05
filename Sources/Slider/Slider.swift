@@ -261,9 +261,9 @@ open class Slider: UIControl {
     open override func layoutSubviews() {
         super.layoutSubviews()
 
+        layoutThumbView()
         layoutForegroundSlider()
         layoutBackgroundTrackView()
-        layoutThumbView()
     }
 
     open func copyStyle(of slider: UISlider) {
