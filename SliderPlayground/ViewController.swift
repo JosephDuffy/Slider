@@ -19,7 +19,13 @@ class ViewController: UIViewController {
             75...90: 200...500,
             90...100: 500...1000,
         ])
-        slider.step = 5
+        slider.scaling = .stepped([
+            0...50: 0...1,
+            50...75: 1...10,
+            75...90: 10...30,
+            90...100: 30...120,
+        ])
+        slider.step = 0.1
         slider.addTarget(self, action: #selector(updateLabel), for: .valueChanged)
         updateLabel()
     }
