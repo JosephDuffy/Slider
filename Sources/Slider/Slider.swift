@@ -471,7 +471,7 @@ open class Slider: UIControl {
 
             sendActions(for: .valueChanged)
 
-            if proposedValue == internalLowerValue.lowerBound(for: .internal) || proposedValue == internalUpperValue.upperBound(for: .internal) {
+            if proposedValue == valueTransformer.lowerBound(for: .internal) || proposedValue == valueTransformer.upperBound(for: .internal) {
                 log?.log("Triggering selection changed haptics", type: .debug)
                 UISelectionFeedbackGenerator().selectionChanged()
             }
