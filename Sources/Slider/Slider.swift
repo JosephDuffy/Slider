@@ -224,8 +224,8 @@ open class Slider: UIControl {
 
     public override init(frame: CGRect) {
         scaling = .linear(0...100)
-        internalLowerValue = .init(externalValue: 25, scaling: scaling)
-        internalUpperValue = .init(externalValue: 75, scaling: scaling)
+        internalLowerValue = .init(externalValue: 0, scaling: scaling)
+        internalUpperValue = .init(externalValue: 100, scaling: scaling)
 
         super.init(frame: frame)
 
@@ -236,8 +236,8 @@ open class Slider: UIControl {
 
     public required init(styledAfter slider: UISlider, frame: CGRect, scaling: Scaling = .linear(0...100)) {
         self.scaling = scaling
-        internalLowerValue = .init(externalValue: 25, scaling: scaling)
-        internalUpperValue = .init(externalValue: 75, scaling: scaling)
+        internalLowerValue = .init(externalValue: 0, scaling: scaling)
+        internalUpperValue = .init(externalValue: 100, scaling: scaling)
 
         super.init(frame: frame)
 
@@ -248,8 +248,8 @@ open class Slider: UIControl {
 
     public required init?(coder aDecoder: NSCoder) {
         scaling = .linear(0...100)
-        internalLowerValue = .init(externalValue: 25, scaling: scaling)
-        internalUpperValue = .init(externalValue: 75, scaling: scaling)
+        internalLowerValue = .init(externalValue: 0, scaling: scaling)
+        internalUpperValue = .init(externalValue: 100, scaling: scaling)
 
         super.init(coder: aDecoder)
 
