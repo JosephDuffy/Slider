@@ -19,8 +19,8 @@
                             <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="uCw-8j-HLY">
                                 <rect key="frame" x="14" y="433" width="386" height="31"/>
                             </slider>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="V17-b7-qBb">
-                                <rect key="frame" x="186" y="318" width="42" height="21"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="V17-b7-qBb">
+                                <rect key="frame" x="8" y="318.5" width="398" height="20.5"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -35,12 +35,13 @@
                             <constraint firstItem="uCw-8j-HLY" firstAttribute="top" secondItem="ccP-M9-PRg" secondAttribute="bottom" constant="32" id="3N5-ii-0Ha"/>
                             <constraint firstItem="ccP-M9-PRg" firstAttribute="top" secondItem="V17-b7-qBb" secondAttribute="bottom" constant="32" id="DZF-5P-avy"/>
                             <constraint firstItem="uCw-8j-HLY" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="JP3-6o-wIh"/>
-                            <constraint firstItem="V17-b7-qBb" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="RD1-ev-BwU"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="uCw-8j-HLY" secondAttribute="trailing" constant="16" id="f1k-WD-D8X"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="ccP-M9-PRg" secondAttribute="trailing" constant="16" id="l7i-wT-upb"/>
                             <constraint firstItem="uCw-8j-HLY" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="16" id="mNF-GJ-ZPl"/>
                             <constraint firstItem="ccP-M9-PRg" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="16" id="mXt-B1-THT"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="V17-b7-qBb" secondAttribute="trailing" constant="8" id="nP5-dn-3xO"/>
                             <constraint firstItem="V17-b7-qBb" firstAttribute="top" relation="greaterThanOrEqual" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="16" placeholder="YES" id="ncU-VR-2rr"/>
+                            <constraint firstItem="V17-b7-qBb" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="8" id="xtG-2m-zRT"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
