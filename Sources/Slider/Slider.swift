@@ -395,10 +395,7 @@ open class Slider: UIControl {
 
     open override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         for touch in touches {
-            guard let trackingThumb = trackedTouchesInitialLocations[touch] else {
-                assertionFailure("There should always be a tracking thumb for a touch that has moved")
-                break
-            }
+            guard let trackingThumb = trackedTouchesInitialLocations[touch] else { continue }
 
             let currentLocation = touch.location(in: self)
             let pointsMoved = currentLocation.x - trackingThumb.startingLocation.x
