@@ -20,13 +20,13 @@
                                 <rect key="frame" x="14" y="433" width="386" height="31"/>
                             </slider>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="V17-b7-qBb">
-                                <rect key="frame" x="186" y="60" width="42" height="21"/>
+                                <rect key="frame" x="186" y="318" width="42" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ccP-M9-PRg" customClass="Slider" customModule="Slider">
-                                <rect key="frame" x="16" y="113" width="382" height="288"/>
+                                <rect key="frame" x="16" y="371" width="382" height="30"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
                         </subviews>
@@ -40,7 +40,7 @@
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="ccP-M9-PRg" secondAttribute="trailing" constant="16" id="l7i-wT-upb"/>
                             <constraint firstItem="uCw-8j-HLY" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="16" id="mNF-GJ-ZPl"/>
                             <constraint firstItem="ccP-M9-PRg" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="16" id="mXt-B1-THT"/>
-                            <constraint firstItem="V17-b7-qBb" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="16" placeholder="YES" id="ncU-VR-2rr"/>
+                            <constraint firstItem="V17-b7-qBb" firstAttribute="top" relation="greaterThanOrEqual" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="16" placeholder="YES" id="ncU-VR-2rr"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
