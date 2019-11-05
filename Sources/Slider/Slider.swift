@@ -499,6 +499,7 @@ open class Slider: UIControl {
             }
 
             sendActions(for: .valueChanged)
+            setNeedsLayout()
         }
     }
 
