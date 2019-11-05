@@ -1,6 +1,7 @@
 import UIKit
 import os.log
 
+@IBDesignable
 open class Slider: UIControl {
 
     private var internalLowerValue: ValueTransformer {
